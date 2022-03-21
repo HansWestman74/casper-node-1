@@ -19,7 +19,7 @@ pub trait Transaction: Sized {
     ///
     /// Any pending operations will not be saved.
     fn abort(self) {
-        unimplemented!("Abort operations should be performed in Drop implementations.")
+        unimplemented!("Abort operations should be performed in Drop implementations.") //?unimplemented
     }
 }
 
