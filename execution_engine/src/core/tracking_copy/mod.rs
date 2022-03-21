@@ -81,10 +81,10 @@ impl Query {
         let next_name = self
             .unvisited_names
             .pop_front()
-            .expect("this should already been checked to be non-empty");
+            .expect("this should already been checked to be non-empty"); //?expect
         self.visited_names.push(next_name);
         // NOTE: safe to unwrap as we have added element just above
-        self.visited_names.last().unwrap()
+        self.visited_names.last().unwrap() //?unwrap
     }
 
     fn navigate(&mut self, key: Key) {
@@ -474,7 +474,7 @@ impl<R: StateReader<Key, StoredValue>> TrackingCopy<R> {
             let stored_value: &StoredValue = proofs
                 .last()
                 .map(|r| r.value())
-                .expect("but we just pushed");
+                .expect("but we just pushed"); //?expect
 
             match stored_value {
                 StoredValue::Account(account) => {
@@ -648,7 +648,7 @@ pub fn validate_query_proof(
     let mut proofs_iter = proofs.iter();
 
     // NOTE: Safe to unwrap since we've done a length check just above
-    let first_proof = proofs_iter.next().unwrap();
+    let first_proof = proofs_iter.next().unwrap(); //?unwrap
 
     if first_proof.key() != &expected_first_key.normalize() {
         return Err(ValidationError::UnexpectedKey);

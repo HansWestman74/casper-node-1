@@ -99,7 +99,7 @@ impl Item for TrieOrChunk {
     fn id(&self, _verifiable_chunked_hash_activation: EraId) -> Self::Id {
         match self {
             TrieOrChunk::Trie(trie) => {
-                let node_bytes = trie.to_bytes().expect("Could not serialize trie to bytes");
+                let node_bytes = trie.to_bytes().expect("Could not serialize trie to bytes"); //?expect
                 TrieOrChunkId(0, Digest::hash(&node_bytes))
             }
             TrieOrChunk::ChunkWithProof(chunked_data) => TrieOrChunkId(

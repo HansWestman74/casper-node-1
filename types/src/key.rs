@@ -463,7 +463,7 @@ impl Key {
     /// bytes.
     pub fn dictionary(seed_uref: URef, dictionary_item_key: &[u8]) -> Key {
         // NOTE: Expect below is safe because the length passed is supported.
-        let mut hasher = VarBlake2b::new(BLAKE2B_DIGEST_LENGTH).expect("should create hasher");
+        let mut hasher = VarBlake2b::new(BLAKE2B_DIGEST_LENGTH).expect("should create hasher"); //?expect
         hasher.update(seed_uref.addr().as_ref());
         hasher.update(dictionary_item_key);
         // NOTE: Assumed safe as size of `HashAddr` equals to the output provided by hasher.

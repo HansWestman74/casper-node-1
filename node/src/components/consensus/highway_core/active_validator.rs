@@ -113,7 +113,7 @@ impl<C: Context> ActiveValidator<C> {
             .transpose()
             .map_err(|err| match err.kind() {
                 io::ErrorKind::NotFound => (),
-                _ => panic!("got an error reading unit file {:?}: {:?}", unit_file, err),
+                _ => panic!("got an error reading unit file {:?}: {:?}", unit_file, err), //?panic
             })
             .ok()
             .flatten();
@@ -462,6 +462,7 @@ impl<C: Context> ActiveValidator<C> {
         let swunit = SignedWireUnit::new(hwunit, &self.secret);
         write_last_unit(&self.unit_file, swunit.clone()).unwrap_or_else(|err| {
             panic!(
+                //?panic
                 "should successfully write unit's hash to {:?}, got {:?}",
                 self.unit_file, err
             )

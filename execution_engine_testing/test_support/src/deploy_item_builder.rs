@@ -271,11 +271,11 @@ impl DeployItemBuilder {
             session: self
                 .deploy_item
                 .session_code
-                .expect("should have session code"),
+                .expect("should have session code"), //?expect
             payment: self
                 .deploy_item
                 .payment_code
-                .expect("should have payment code"),
+                .expect("should have payment code"), //?expect
             gas_price: self.deploy_item.gas_price,
             authorization_keys: self.deploy_item.authorization_keys,
             deploy_hash: self

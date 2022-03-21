@@ -132,7 +132,7 @@ impl State {
                 .holders
                 .iter()
                 .next()
-                .expect("holders cannot be empty if we don't hold the data");
+                .expect("holders cannot be empty if we don't hold the data"); //?expect
             GossipAction::GetRemainder { holder }
         } else {
             GossipAction::AwaitingRemainder

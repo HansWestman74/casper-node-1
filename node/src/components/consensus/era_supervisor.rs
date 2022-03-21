@@ -158,6 +158,7 @@ impl EraSupervisor {
     ) -> Result<(Self, Effects<Event>), Error> {
         if current_era <= chainspec.activation_era() {
             panic!(
+                //?panic
                 "Current era ({:?}) is before the last activation point ({:?}) - no eras would \
                 be instantiated!",
                 current_era,
@@ -169,7 +170,7 @@ impl EraSupervisor {
         let (secret_signing_key, public_signing_key) = config.load_keys(root)?;
         info!(our_id = %public_signing_key, "EraSupervisor pubkey",);
         let metrics =
-            Metrics::new(registry).expect("failed to set up and register consensus metrics");
+            Metrics::new(registry).expect("failed to set up and register consensus metrics"); //?expect
         #[allow(clippy::integer_arithmetic)] // Block height should never reach u64::MAX.
         let next_height = latest_block_header.height() + 1;
 
@@ -264,7 +265,7 @@ impl EraSupervisor {
         u64::from_le_bytes(
             result[0..std::mem::size_of::<u64>()]
                 .try_into()
-                .expect("could not convert [u8] slice to [u8;8]"),
+                .expect("could not convert [u8] slice to [u8;8]"), //?expect
         )
     }
 
@@ -825,7 +826,7 @@ impl EraSupervisor {
     fn era_mut(&mut self, era_id: EraId) -> &mut Era {
         self.open_eras
             .get_mut(&era_id)
-            .expect("open_eras should gave era_id")
+            .expect("open_eras should gave era_id") //?expect
     }
 
     #[allow(clippy::integer_arithmetic)] // Block height should never reach u64::MAX.
@@ -923,7 +924,7 @@ impl EraSupervisor {
                 let era = self
                     .open_eras
                     .get_mut(&era_id)
-                    .expect("open_eras did not contain era_id key");
+                    .expect("open_eras did not contain era_id key"); //?expect
                 era.add_accusations(&equivocators);
                 era.add_accusations(value.accusations());
                 // If this is the era's last block, it contains rewards. Everyone who is accused in
@@ -1144,7 +1145,7 @@ where
                     ?switch_block_era_id,
                     "switch block header era must exist to initialize era"
                 );
-                panic!("switch block header not found in storage");
+                panic!("switch block header not found in storage"); //?panic
             }
         }
     }

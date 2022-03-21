@@ -466,7 +466,7 @@ pub mod gens {
             mut associated_keys in associated_keys_arb(),
         ) -> Account {
                 //? Incorrect documentation for add_key?? Return type of add_key is not bool
-                associated_keys.add_key(account_hash, Weight::new(1)).unwrap();
+                associated_keys.add_key(account_hash, Weight::new(1)).unwrap();//?unwrap
                 Account::new(
                     account_hash,
                     urefs,

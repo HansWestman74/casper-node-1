@@ -16,13 +16,13 @@ pub fn public_key_arb() -> impl Strategy<Value = PublicKey> {
     prop_oneof![
         Just(PublicKey::System),
         collection::vec(<u8>::arbitrary(), SecretKey::ED25519_LENGTH).prop_map(|bytes| {
-            let byte_array: [u8; SecretKey::ED25519_LENGTH] = bytes.try_into().unwrap();
-            let secret_key = SecretKey::ed25519_from_bytes(byte_array).unwrap();
+            let byte_array: [u8; SecretKey::ED25519_LENGTH] = bytes.try_into().unwrap(); //?unwrap
+            let secret_key = SecretKey::ed25519_from_bytes(byte_array).unwrap(); //?unwrap
             PublicKey::from(&secret_key)
         }),
         collection::vec(<u8>::arbitrary(), SecretKey::SECP256K1_LENGTH).prop_map(|bytes| {
-            let bytes_array: [u8; SecretKey::SECP256K1_LENGTH] = bytes.try_into().unwrap();
-            let secret_key = SecretKey::secp256k1_from_bytes(bytes_array).unwrap();
+            let bytes_array: [u8; SecretKey::SECP256K1_LENGTH] = bytes.try_into().unwrap(); //?unwrap
+            let secret_key = SecretKey::secp256k1_from_bytes(bytes_array).unwrap(); //?unwrap
             PublicKey::from(&secret_key)
         })
     ]
@@ -33,14 +33,14 @@ pub fn public_key_arb_no_system() -> impl Strategy<Value = PublicKey> {
     // NOTE: All unwraps safe as all data is generated internally to this function
     prop_oneof![
         collection::vec(<u8>::arbitrary(), SecretKey::ED25519_LENGTH).prop_map(|bytes| {
-            let byte_array: [u8; SecretKey::ED25519_LENGTH] = bytes.try_into().unwrap();
-            let secret_key = SecretKey::ed25519_from_bytes(byte_array).unwrap();
+            let byte_array: [u8; SecretKey::ED25519_LENGTH] = bytes.try_into().unwrap(); //?unwrap
+            let secret_key = SecretKey::ed25519_from_bytes(byte_array).unwrap(); //?unwrap
             PublicKey::from(&secret_key)
         }),
         collection::vec(<u8>::arbitrary(), SecretKey::SECP256K1_LENGTH).prop_map(|bytes| {
-            let bytes_array: [u8; SecretKey::SECP256K1_LENGTH] = bytes.try_into().unwrap();
+            let bytes_array: [u8; SecretKey::SECP256K1_LENGTH] = bytes.try_into().unwrap(); //?unwrap
             let secret_key = SecretKey::secp256k1_from_bytes(bytes_array).unwrap();
-            PublicKey::from(&secret_key)
+            PublicKey::from(&secret_key) //?unwrap
         })
     ]
 }

@@ -253,7 +253,7 @@ impl ConnectionId {
         let full_hash = Digest::hash(&buffer);
 
         // Safe to expect here, as we assert earlier that `Digest` is at least 12 bytes.
-        let truncated = TryFrom::try_from(&full_hash.value()[0..8]).expect("buffer size mismatch");
+        let truncated = TryFrom::try_from(&full_hash.value()[0..8]).expect("buffer size mismatch"); //?expect
 
         TraceId(truncated)
     }

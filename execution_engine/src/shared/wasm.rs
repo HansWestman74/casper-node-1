@@ -23,7 +23,7 @@ pub fn do_nothing_bytes() -> Vec<u8> {
         .memory()
         .build()
         .build();
-    parity_wasm::serialize(module).expect("should serialize")
+    parity_wasm::serialize(module).expect("should serialize") //?expect
 }
 
 /// Creates a module which is a valid Wasm but does nothing.

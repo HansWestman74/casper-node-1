@@ -30,6 +30,7 @@ impl Chainspec {
             regex
                 .captures(chainspec.contents())
                 .unwrap_or_else(|| {
+                    //?panic
                     panic!(
                         "should find protocol version and activation point in {}",
                         chainspec_path.display()
@@ -37,6 +38,7 @@ impl Chainspec {
                 })
                 .get(CAPTURE_INDEX)
                 .unwrap_or_else(|| {
+                     //?panic
                     panic!(
                         "protocol version and activation point should be regex capture at index {} in {}",
                         CAPTURE_INDEX,
@@ -50,7 +52,7 @@ impl Chainspec {
         let protocol_version = find_value(&*regex_data::chainspec_protocol_version::REGEX);
         let current_activation_point = find_value(&*regex_data::chainspec_activation_point::REGEX);
         let current_protocol_version = SemVer::try_from(protocol_version.as_str())
-            .expect("should parse current protocol version");
+            .expect("should parse current protocol version"); //?expect
 
         Chainspec {
             current_protocol_version,
@@ -139,7 +141,7 @@ impl Chainspec {
                 "Current chainspec activation point is {}.  Enter new activation point (leave blank for unchanged): ",
                 self.current_activation_point
             );
-            io::stdout().flush().expect("should flush stdout");
+            io::stdout().flush().expect("should flush stdout"); //?expect
             let mut input = String::new();
             match io::stdin().read_line(&mut input) {
                 Ok(_) => {

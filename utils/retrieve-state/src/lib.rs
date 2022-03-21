@@ -177,7 +177,7 @@ pub async fn download_block_with_deploys(
     let block = get_block(client, url, Some(GetBlockParams { block_identifier }))
         .await?
         .block
-        .unwrap(); //? Safe to unwrap?
+        .unwrap();
 
     let mut transfers = Vec::new();
     for transfer_hash in block.transfer_hashes() {

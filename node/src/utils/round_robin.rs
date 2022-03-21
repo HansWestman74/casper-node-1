@@ -138,7 +138,7 @@ where
             let queue_guard = self
                 .queues
                 .get(&kind)
-                .expect("missing queue while snapshotting")
+                .expect("missing queue while snapshotting") //?expect
                 .queue
                 .lock()
                 .await;
@@ -188,7 +188,7 @@ where
             let queue_guard = self
                 .queues
                 .get(&kind)
-                .expect("missing queue while locking")
+                .expect("missing queue while locking") //?expect
                 .queue
                 .lock()
                 .await;
@@ -209,7 +209,7 @@ where
     /// Creates a queue for each pair given in `weights`. The second component of each `weight` is
     /// the number of times to return items from one queue before moving on to the next one.
     pub(crate) fn new(weights: Vec<(K, NonZeroUsize)>) -> Self {
-        //? Change assert-->debug_assert+error! ?
+        //?assert
         assert!(!weights.is_empty(), "must provide at least one slot");
 
         let queues = weights
@@ -250,7 +250,7 @@ where
 
         self.queues
             .get(&queue)
-            .expect("tried to push to non-existent queue")
+            .expect("tried to push to non-existent queue") //?expect
             .push_back(item)
             .await;
 
@@ -264,7 +264,7 @@ where
     pub(crate) async fn pop(&self) -> (I, K) {
         // Safe to `expect` here as the only way for acquiring a permit to fail would be if the
         // `self.total` semaphore were closed.
-        self.total.acquire().await.expect("should acquire").forget();
+        self.total.acquire().await.expect("should acquire").forget(); //?expect
 
         let mut inner = self.state.lock().await;
 
@@ -274,7 +274,7 @@ where
                 .queues
                 // The queue disappearing should never happen.
                 .get(&inner.active_slot.key)
-                .expect("the queue disappeared. this should not happen");
+                .expect("the queue disappeared. this should not happen"); //?expect
 
             let mut current_queue = queue_state.queue.lock().await;
 
@@ -291,7 +291,7 @@ where
             let item = current_queue
                 .pop_front()
                 // We hold the queue's lock and checked `is_empty` earlier.
-                .expect("item disappeared. this should not happen");
+                .expect("item disappeared. this should not happen"); //?expect
             queue_state.dec_count();
             break (item, inner.active_slot.key);
         }
@@ -302,7 +302,7 @@ where
         let events = self
             .queues
             .get(&queue)
-            .expect("queue to be drained disappeared")
+            .expect("queue to be drained disappeared") //?expect
             .drain()
             .await;
 
@@ -310,7 +310,7 @@ where
         self.total
             .acquire_many(events.len() as u32)
             .await
-            .expect("could not acquire tickets during drain")
+            .expect("could not acquire tickets during drain") //?expect
             .forget();
 
         events

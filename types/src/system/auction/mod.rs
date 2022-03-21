@@ -520,6 +520,7 @@ pub trait Auction:
             }
 
             let previous_recipients = snapshot.insert(delayed_era, recipients);
+            //?assert
             assert!(
                 previous_recipients.is_none(),
                 "previous_recipients should be None"

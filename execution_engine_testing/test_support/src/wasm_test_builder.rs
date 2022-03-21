@@ -125,7 +125,7 @@ impl Default for InMemoryWasmTestBuilder {
         Self::initialize_logging();
         let engine_config = EngineConfig::default();
 
-        let global_state = InMemoryGlobalState::empty().expect("should create global state");
+        let global_state = InMemoryGlobalState::empty().expect("should create global state"); //?expect
         let engine_state = EngineState::new(global_state, engine_config);
 
         WasmTestBuilder {
@@ -203,15 +203,15 @@ impl LmdbWasmTestBuilder {
                 DEFAULT_MAX_READERS,
                 true,
             )
-            .expect("should create LmdbEnvironment"),
+            .expect("should create LmdbEnvironment"), //?expect
         );
         let trie_store = Arc::new(
             LmdbTrieStore::new(&environment, None, DatabaseFlags::empty())
-                .expect("should create LmdbTrieStore"),
+                .expect("should create LmdbTrieStore"), //?expect
         );
 
         let global_state =
-            LmdbGlobalState::empty(environment, trie_store).expect("should create LmdbGlobalState");
+            LmdbGlobalState::empty(environment, trie_store).expect("should create LmdbGlobalState"); //?expect
         let engine_state = EngineState::new(global_state, engine_config);
         WasmTestBuilder {
             engine_state: Rc::new(engine_state),
@@ -235,7 +235,7 @@ impl LmdbWasmTestBuilder {
         let engine_state = &*self.engine_state;
         engine_state
             .flush_environment()
-            .expect("should flush environment");
+            .expect("should flush environment"); //?expect
     }
 
     /// Returns a new [`LmdbWasmTestBuilder`].
@@ -272,13 +272,13 @@ impl LmdbWasmTestBuilder {
                 DEFAULT_MAX_READERS,
                 true,
             )
-            .expect("should create LmdbEnvironment"),
+            .expect("should create LmdbEnvironment"), //?expect
         );
         let trie_store =
-            Arc::new(LmdbTrieStore::open(&environment, None).expect("should open LmdbTrieStore"));
+            Arc::new(LmdbTrieStore::open(&environment, None).expect("should open LmdbTrieStore")); //?expect
 
         let global_state =
-            LmdbGlobalState::empty(environment, trie_store).expect("should create LmdbGlobalState");
+            LmdbGlobalState::empty(environment, trie_store).expect("should create LmdbGlobalState"); //?expect
         let engine_state = EngineState::new(global_state, engine_config);
         WasmTestBuilder {
             engine_state: Rc::new(engine_state),
@@ -300,6 +300,7 @@ impl LmdbWasmTestBuilder {
     fn create_global_state_dir<T: AsRef<Path>>(global_state_path: T) {
         fs::create_dir_all(&global_state_path).unwrap_or_else(|_| {
             panic!(
+                //?panic
                 "Expected to create {}",
                 global_state_path.as_ref().display()
             )
@@ -322,11 +323,11 @@ impl LmdbWasmTestBuilder {
         let cached_state = self
             .scratch_engine_state
             .as_ref()
-            .expect("scratch state should exist");
+            .expect("scratch state should exist"); //?expect
 
         // Scratch still requires that one deploy be executed and committed at a time.
         let exec_request = {
-            let hash = self.post_state_hash.expect("expected post_state_hash");
+            let hash = self.post_state_hash.expect("expected post_state_hash"); //?expect
             exec_request.parent_state_hash = hash;
             exec_request
         };
@@ -342,10 +343,10 @@ impl LmdbWasmTestBuilder {
             let _post_state_hash = cached_state
                 .apply_effect(
                     CorrelationId::new(),
-                    self.post_state_hash.expect("requires a post_state_hash"),
+                    self.post_state_hash.expect("requires a post_state_hash"), //?expect
                     transforms,
                 )
-                .expect("should commit");
+                .expect("should commit"); //?expect
 
             // Save transforms and execution results for WasmTestBuilder.
             self.transforms.push(journal);
@@ -357,12 +358,12 @@ impl LmdbWasmTestBuilder {
 
     /// Commit scratch to global state, and reset the scratch cache.
     pub fn write_scratch_to_lmdb(&mut self) -> &mut Self {
-        let prestate_hash = self.post_state_hash.expect("Should have genesis hash");
+        let prestate_hash = self.post_state_hash.expect("Should have genesis hash"); //?expect
         if let Some(scratch) = self.scratch_engine_state.take() {
             self.post_state_hash = Some(
                 self.engine_state
                     .write_scratch_to_lmdb(prestate_hash, scratch.into_inner())
-                    .expect("should be able to write to lmdb"),
+                    .expect("should be able to write to lmdb"), //?expect
             );
         }
         self
@@ -390,13 +391,13 @@ where
                 run_genesis_request.protocol_version(),
                 run_genesis_request.ee_config(),
             )
-            .expect("Unable to get genesis response");
+            .expect("Unable to get genesis response"); //?expect
 
         let transforms = execution_effect.transforms;
         let empty_path: Vec<String> = vec![];
 
         let genesis_account =
-            utils::get_account(&transforms, &system_account).expect("Unable to get system account");
+            utils::get_account(&transforms, &system_account).expect("Unable to get system account"); //?expect
 
         let registry = match self.query(
             Some(post_state_hash),
@@ -405,27 +406,27 @@ where
         ) {
             Ok(StoredValue::CLValue(cl_registry)) => {
                 CLValue::into_t::<SystemContractRegistry>(cl_registry)
-                    .expect("should be able to convert from CLValue")
+                    .expect("should be able to convert from CLValue") //?expect
             }
-            Ok(_) => panic!("Failed to get system registry"),
-            Err(err) => panic!("{}", err),
+            Ok(_) => panic!("Failed to get system registry"), //?panic
+            Err(err) => panic!("{}", err),                    //?panic
         };
 
         self.genesis_hash = Some(post_state_hash);
         self.post_state_hash = Some(post_state_hash);
-        self.mint_contract_hash = Some(*registry.get(MINT).expect("should have mint hash"));
+        self.mint_contract_hash = Some(*registry.get(MINT).expect("should have mint hash")); //?expect
         self.handle_payment_contract_hash = Some(
             *registry
                 .get(HANDLE_PAYMENT)
-                .expect("should have handle payment hash"),
+                .expect("should have handle payment hash"), //?expect
         );
         self.standard_payment_hash = Some(
             *registry
                 .get(STANDARD_PAYMENT)
-                .expect("should have standard payment hash"),
+                .expect("should have standard payment hash"), //?expect
         );
         self.auction_contract_hash =
-            Some(*registry.get(AUCTION).expect("should have auction hash"));
+            Some(*registry.get(AUCTION).expect("should have auction hash")); //?expect
         self.genesis_account = Some(genesis_account);
         self.genesis_transforms = Some(transforms);
         self
@@ -440,14 +441,14 @@ where
     ) -> Result<StoredValue, String> {
         let post_state = maybe_post_state
             .or(self.post_state_hash)
-            .expect("builder must have a post-state hash");
+            .expect("builder must have a post-state hash"); //?expect
 
         let query_request = QueryRequest::new(post_state, base_key, path.to_vec());
 
         let query_result = self
             .engine_state
             .run_query(CorrelationId::new(), query_request)
-            .expect("should get query response");
+            .expect("should get query response"); //?expect
 
         if let QueryResult::Success { value, .. } = query_result {
             return Ok(value.deref().clone());
@@ -478,7 +479,7 @@ where
     ) -> Result<(StoredValue, Vec<TrieMerkleProof<Key, StoredValue>>), String> {
         let post_state = maybe_post_state
             .or(self.post_state_hash)
-            .expect("builder must have a post-state hash");
+            .expect("builder must have a post-state hash"); //?expect
 
         let path_vec: Vec<String> = path.to_vec();
 
@@ -487,7 +488,7 @@ where
         let query_result = self
             .engine_state
             .run_query(CorrelationId::new(), query_request)
-            .expect("should get query response");
+            .expect("should get query response"); //?expect
 
         if let QueryResult::Success { value, proofs } = query_result {
             return Ok((value.deref().clone(), proofs));
@@ -502,15 +503,15 @@ where
     pub fn total_supply(&self, maybe_post_state: Option<Digest>) -> U512 {
         let mint_key: Key = self
             .mint_contract_hash
-            .expect("should have mint_contract_hash")
+            .expect("should have mint_contract_hash") //?expect
             .into();
 
         let result = self.query(maybe_post_state, mint_key, &[TOTAL_SUPPLY_KEY.to_string()]);
 
         let total_supply: U512 = if let Ok(StoredValue::CLValue(total_supply)) = result {
-            total_supply.into_t().expect("total supply should be U512")
+            total_supply.into_t().expect("total supply should be U512") //?expect
         } else {
-            panic!("mint should track total supply");
+            panic!("mint should track total supply"); //?panic
         };
 
         total_supply
@@ -519,7 +520,7 @@ where
     /// Runs an [`ExecuteRequest`].
     pub fn exec(&mut self, mut exec_request: ExecuteRequest) -> &mut Self {
         let exec_request = {
-            let hash = self.post_state_hash.expect("expected post_state_hash");
+            let hash = self.post_state_hash.expect("expected post_state_hash"); //?expect
             exec_request.parent_state_hash = hash;
             exec_request
         };
@@ -528,14 +529,14 @@ where
             .engine_state
             .run_execute(CorrelationId::new(), exec_request);
 
-        //? Change assert-->debug_assert+error! ?
+        //?assert
         assert!(maybe_exec_results.is_ok(), "exec_results should succeed");
 
         // Parse deploy results
         let execution_results = maybe_exec_results
             .as_ref()
-            .expect("should have exec_results");
-        // Cache transformations
+            .expect("should have exec_results"); //?expect
+                                                 // Cache transformations
         self.transforms.extend(
             execution_results
                 .iter()
@@ -543,7 +544,7 @@ where
         );
         self.exec_results.push(
             maybe_exec_results
-                .expect("should have exec_results")
+                .expect("should have exec_results") //?expect
                 .into_iter()
                 .map(Rc::new)
                 .collect(),
@@ -553,7 +554,7 @@ where
 
     /// Commit effects of previous exec call on the latest post-state hash.
     pub fn commit(&mut self) -> &mut Self {
-        let prestate_hash = self.post_state_hash.expect("Should have genesis hash");
+        let prestate_hash = self.post_state_hash.expect("Should have genesis hash"); //?expect
 
         let effects = self.transforms.last().cloned().unwrap_or_default();
 
@@ -570,7 +571,7 @@ where
         let post_state_hash = self
             .engine_state
             .apply_effect(CorrelationId::new(), pre_state_hash, effects)
-            .expect("should commit");
+            .expect("should commit"); //?expect
         self.post_state_hash = Some(post_state_hash);
         self
     }
@@ -581,10 +582,10 @@ where
         engine_config: EngineConfig,
         upgrade_config: &mut UpgradeConfig,
     ) -> &mut Self {
-        let pre_state_hash = self.post_state_hash.expect("should have state hash");
+        let pre_state_hash = self.post_state_hash.expect("should have state hash"); //?expect
         upgrade_config.with_pre_state_hash(pre_state_hash);
 
-        let engine_state = Rc::get_mut(&mut self.engine_state).expect("should be safe to mutate");
+        let engine_state = Rc::get_mut(&mut self.engine_state).expect("should be safe to mutate"); //?expect
         engine_state.update_config(engine_config);
 
         let empty_path: Vec<String> = vec![];
@@ -595,27 +596,27 @@ where
             &empty_path,
         ) {
             let registry = CLValue::into_t::<SystemContractRegistry>(cl_registry)
-                .expect("should be able to convert from CLValue");
+                .expect("should be able to convert from CLValue"); //?expect
             if self.mint_contract_hash.is_none() {
-                self.mint_contract_hash = Some(*registry.get(MINT).expect("should have mint hash"))
+                self.mint_contract_hash = Some(*registry.get(MINT).expect("should have mint hash")) //?expect
             };
             if self.handle_payment_contract_hash.is_none() {
                 self.handle_payment_contract_hash = Some(
                     *registry
                         .get(HANDLE_PAYMENT)
-                        .expect("should have handle payment hash"),
+                        .expect("should have handle payment hash"), //?expect
                 )
             }
             if self.standard_payment_hash.is_none() {
                 self.standard_payment_hash = Some(
                     *registry
                         .get(STANDARD_PAYMENT)
-                        .expect("should have standard payment hash"),
+                        .expect("should have standard payment hash"), //?expect
                 )
             }
             if self.auction_contract_hash.is_none() {
                 self.auction_contract_hash =
-                    Some(*registry.get(AUCTION).expect("should have auction hash"))
+                    Some(*registry.get(AUCTION).expect("should have auction hash")) //?expect
             }
         }
 
@@ -676,13 +677,14 @@ where
         // Check first result, as only first result is interesting for a simple test
         let exec_results = self
             .get_last_exec_results()
-            .expect("Expected to be called after run()");
+            .expect("Expected to be called after run()"); //?expect
         let exec_result = exec_results
             .get(0)
-            .expect("Unable to get first deploy result");
+            .expect("Unable to get first deploy result"); //?expect
 
         if exec_result.is_failure() {
             panic!(
+                //?panic
                 "Expected successful execution result, but instead got: {:#?}",
                 exec_result,
             );
@@ -695,13 +697,14 @@ where
         // Check first result, as only first result is interesting for a simple test
         let exec_results = self
             .get_last_exec_results()
-            .expect("Expected to be called after run()");
+            .expect("Expected to be called after run()"); //?expect
         let exec_result = exec_results
             .get(0)
-            .expect("Unable to get first deploy result");
+            .expect("Unable to get first deploy result"); //?expect
 
         if exec_result.is_success() {
             panic!(
+                //?panic
                 "Expected failed execution result, but instead got: {:?}",
                 exec_result,
             );
@@ -713,18 +716,18 @@ where
     /// Returns `true` if the las exec had an error, otherwise returns false.
     pub fn is_error(&self) -> bool {
         self.get_last_exec_results()
-            .expect("Expected to be called after run()")
+            .expect("Expected to be called after run()") //?expect
             .get(0)
-            .expect("Unable to get first execution result")
+            .expect("Unable to get first execution result") //?expect
             .is_failure()
     }
 
     /// Returns an `Option<engine_state::Error>` if the last exec had an error.
     pub fn get_error(&self) -> Option<engine_state::Error> {
         self.get_last_exec_results()
-            .expect("Expected to be called after run()")
+            .expect("Expected to be called after run()") //?expect
             .get(0)
-            .expect("Unable to get first deploy result")
+            .expect("Unable to get first deploy result") //?expect
             .as_error()
             .cloned()
     }
@@ -751,32 +754,32 @@ where
     pub fn get_genesis_account(&self) -> &Account {
         self.genesis_account
             .as_ref()
-            .expect("Unable to obtain genesis account. Please run genesis first.")
+            .expect("Unable to obtain genesis account. Please run genesis first.") //?expect
     }
 
     /// Returns the [`ContractHash`] of the mint, panics if it can't be found.
     pub fn get_mint_contract_hash(&self) -> ContractHash {
         self.mint_contract_hash
-            .expect("Unable to obtain mint contract. Please run genesis first.")
+            .expect("Unable to obtain mint contract. Please run genesis first.") //?expect
     }
 
     /// Returns the [`ContractHash`] of the "handle payment" contract, panics if it can't be found.
     pub fn get_handle_payment_contract_hash(&self) -> ContractHash {
         self.handle_payment_contract_hash
-            .expect("Unable to obtain handle payment contract. Please run genesis first.")
+            .expect("Unable to obtain handle payment contract. Please run genesis first.") //?expect
     }
 
     /// Returns the [`ContractHash`] of the "standard payment" contract, panics if it can't be
     /// found.
     pub fn get_standard_payment_contract_hash(&self) -> ContractHash {
         self.standard_payment_hash
-            .expect("Unable to obtain standard payment contract. Please run genesis first.")
+            .expect("Unable to obtain standard payment contract. Please run genesis first.") //?expect
     }
 
     /// Returns the [`ContractHash`] of the "auction" contract, panics if it can't be found.
     pub fn get_auction_contract_hash(&self) -> ContractHash {
         self.auction_contract_hash
-            .expect("Unable to obtain auction contract. Please run genesis first.")
+            .expect("Unable to obtain auction contract. Please run genesis first.") //?expect
     }
 
     /// Returns genesis transforms, panics if there aren't any.
@@ -789,12 +792,12 @@ where
     /// Returns the genesis hash, panics if it can't be found.
     pub fn get_genesis_hash(&self) -> Digest {
         self.genesis_hash
-            .expect("Genesis hash should be present. Should be called after run_genesis.")
+            .expect("Genesis hash should be present. Should be called after run_genesis.") //?expect
     }
 
     /// Returns the post state hash, panics if it can't be found.
     pub fn get_post_state_hash(&self) -> Digest {
-        self.post_state_hash.expect("Should have post-state hash.")
+        self.post_state_hash.expect("Should have post-state hash.") //?expect
     }
 
     /// Returns the engine state.
@@ -835,10 +838,10 @@ where
         let result = self
             .upgrade_results
             .last()
-            .expect("Expected to be called after a system upgrade.")
+            .expect("Expected to be called after a system upgrade.") //?expect
             .as_ref();
 
-        result.unwrap_or_else(|_| panic!("Expected success, got: {:?}", result));
+        result.unwrap_or_else(|_| panic!("Expected success, got: {:?}", result)); //?panic
 
         self
     }
@@ -847,11 +850,11 @@ where
     pub fn get_handle_payment_contract(&self) -> Contract {
         let handle_payment_contract: Key = self
             .handle_payment_contract_hash
-            .expect("should have handle payment contract uref")
+            .expect("should have handle payment contract uref") //?expect
             .into();
         self.query(None, handle_payment_contract, &[])
             .and_then(|v| v.try_into().map_err(|error| format!("{:?}", error)))
-            .expect("should find handle payment URef")
+            .expect("should find handle payment URef") //?expect
     }
 
     /// Returns the balance of a purse, panics if the balance can't be parsed into a `U512`.
@@ -860,32 +863,32 @@ where
         self.query(None, base_key, &[])
             .and_then(|v| CLValue::try_from(v).map_err(|error| format!("{:?}", error)))
             .and_then(|cl_value| cl_value.into_t().map_err(|error| format!("{:?}", error)))
-            .expect("should parse balance into a U512")
+            .expect("should parse balance into a U512") //?expect
     }
 
     /// Returns a `BalanceResult` for a purse, panics if the balance can't be found.
     pub fn get_purse_balance_result(&self, purse: URef) -> BalanceResult {
         let correlation_id = CorrelationId::new();
-        let state_root_hash: Digest = self.post_state_hash.expect("should have post_state_hash");
+        let state_root_hash: Digest = self.post_state_hash.expect("should have post_state_hash"); //?expect
         self.engine_state
             .get_purse_balance(correlation_id, state_root_hash, purse)
-            .expect("should get purse balance")
+            .expect("should get purse balance") //?expect
     }
 
     /// Returns a `BalanceResult` for a purse using a `PublicKey`.
     pub fn get_public_key_balance_result(&self, public_key: PublicKey) -> BalanceResult {
         let correlation_id = CorrelationId::new();
-        let state_root_hash: Digest = self.post_state_hash.expect("should have post_state_hash");
+        let state_root_hash: Digest = self.post_state_hash.expect("should have post_state_hash"); //?expect
         self.engine_state
             .get_balance(correlation_id, state_root_hash, public_key)
-            .expect("should get purse balance using public key")
+            .expect("should get purse balance using public key") //?expect
     }
 
     /// Gets the purse balance of a proposer.
     pub fn get_proposer_purse_balance(&self) -> U512 {
         let proposer_account = self
             .get_account(*DEFAULT_PROPOSER_ADDR)
-            .expect("proposer account should exist");
+            .expect("proposer account should exist"); //?expect
         self.get_purse_balance(proposer_account.main_purse())
     }
 
@@ -902,14 +905,14 @@ where
 
     /// Queries for an `Account` and panics if it can't be found.
     pub fn get_expected_account(&self, account_hash: AccountHash) -> Account {
-        self.get_account(account_hash).expect("account to exist")
+        self.get_account(account_hash).expect("account to exist") //?expect
     }
 
     /// Queries for a contract by `ContractHash`.
     pub fn get_contract(&self, contract_hash: ContractHash) -> Option<Contract> {
         let contract_value: StoredValue = self
             .query(None, contract_hash.into(), &[])
-            .expect("should have contract value");
+            .expect("should have contract value"); //?expect
 
         if let StoredValue::Contract(contract) = contract_value {
             Some(contract)
@@ -922,7 +925,7 @@ where
     pub fn get_contract_wasm(&self, contract_hash: ContractHash) -> Option<ContractWasm> {
         let contract_value: StoredValue = self
             .query(None, contract_hash.into(), &[])
-            .expect("should have contract value");
+            .expect("should have contract value"); //?expect
 
         if let StoredValue::ContractWasm(contract_wasm) = contract_value {
             Some(contract_wasm)
@@ -938,7 +941,7 @@ where
     ) -> Option<ContractPackage> {
         let contract_value: StoredValue = self
             .query(None, contract_package_hash.into(), &[])
-            .expect("should have package value");
+            .expect("should have package value"); //?expect
 
         if let StoredValue::ContractPackage(package) = contract_value {
             Some(package)
@@ -951,7 +954,7 @@ where
     pub fn get_transfer(&self, transfer: TransferAddr) -> Option<Transfer> {
         let transfer_value: StoredValue = self
             .query(None, Key::Transfer(transfer), &[])
-            .expect("should have transfer value");
+            .expect("should have transfer value"); //?expect
 
         if let StoredValue::Transfer(transfer) = transfer_value {
             Some(transfer)
@@ -964,7 +967,7 @@ where
     pub fn get_deploy_info(&self, deploy_hash: DeployHash) -> Option<DeployInfo> {
         let deploy_info_value: StoredValue = self
             .query(None, Key::DeployInfo(deploy_hash), &[])
-            .expect("should have deploy info value");
+            .expect("should have deploy info value"); //?expect
 
         if let StoredValue::DeployInfo(deploy_info) = deploy_info_value {
             Some(deploy_info)
@@ -977,7 +980,7 @@ where
     pub fn exec_costs(&self, index: usize) -> Vec<Gas> {
         let exec_results = self
             .get_exec_result(index)
-            .expect("should have exec response");
+            .expect("should have exec response"); //?expect
         utils::get_exec_costs(exec_results)
     }
 
@@ -985,7 +988,7 @@ where
     pub fn last_exec_gas_cost(&self) -> Gas {
         let exec_results = self
             .get_last_exec_results()
-            .expect("Expected to be called after run()");
+            .expect("Expected to be called after run()"); //?expect
         let exec_result = exec_results.get(0).expect("should have result");
         exec_result.cost()
     }
@@ -1003,7 +1006,7 @@ where
         let request = GetEraValidatorsRequest::new(state_hash, *DEFAULT_PROTOCOL_VERSION);
         self.engine_state
             .get_era_validators(correlation_id, request)
-            .expect("get era validators should not error")
+            .expect("get era validators should not error") //?expect
     }
 
     /// Gets [`ValidatorWeights`] for a given [`EraId`].
@@ -1019,11 +1022,11 @@ where
         let get_bids_result = self
             .engine_state
             .get_bids(CorrelationId::new(), get_bids_request)
-            .expect("should have bids");
+            .expect("should have bids"); //?expect
 
         get_bids_result
             .into_success()
-            .expect("get_bids_result should succeed")
+            .expect("get_bids_result should succeed") //?expect
     }
 
     /// Gets [`UnbondingPurses`].
@@ -1034,8 +1037,8 @@ where
         let tracking_copy = self
             .engine_state
             .tracking_copy(state_root_hash)
-            .expect("failed to create new tracking copy for get_unbounds")
-            .expect("did not receive tracking copy for get_unbounds");
+            .expect("failed to create new tracking copy for get_unbounds") //?expect
+            .expect("did not receive tracking copy for get_unbounds"); //?expect
 
         let reader = tracking_copy.reader();
 
@@ -1065,8 +1068,8 @@ where
         let tracking_copy = self
             .engine_state
             .tracking_copy(state_root_hash)
-            .expect("failed to create new tracking copy for get_withdraws")
-            .expect("did not receive tracking copy for get_withdraws");
+            .expect("failed to create new tracking copy for get_withdraws") //?expect
+            .expect("did not receive tracking copy for get_withdraws"); //?expect
 
         let reader = tracking_copy.reader();
 
@@ -1096,8 +1099,8 @@ where
         let tracking_copy = self
             .engine_state
             .tracking_copy(state_root_hash)
-            .expect("failed to create new tracking copy for get_balance_keys")
-            .expect("did not receive tracking copy for get_balance_keys");
+            .expect("failed to create new tracking copy for get_balance_keys") //?expect
+            .expect("did not receive tracking copy for get_balance_keys"); //?expect
 
         let reader = tracking_copy.reader();
 
@@ -1113,17 +1116,17 @@ where
     {
         let contract = self
             .get_contract(contract_hash)
-            .expect("should have contract");
+            .expect("should have contract"); //?expect
         let key = contract
             .named_keys()
             .get(name)
             .expect("should have named key");
-        let stored_value = self.query(None, *key, &[]).expect("should query");
+        let stored_value = self.query(None, *key, &[]).expect("should query"); //?expect
         let cl_value = stored_value
             .as_cl_value()
             .cloned()
             .expect("should be cl value");
-        let result: T = cl_value.into_t().expect("should convert");
+        let result: T = cl_value.into_t().expect("should convert"); //?expect
         result
     }
 
@@ -1145,7 +1148,7 @@ where
         let state_root_hash = self.get_post_state_hash();
         self.engine_state
             .get_system_auction_hash(correlation_id, state_root_hash)
-            .expect("should have auction hash")
+            .expect("should have auction hash") //?expect
     }
 
     /// Gets the [`ContractHash`] of the system mint contract, panics if it can't be found.
@@ -1154,7 +1157,7 @@ where
         let state_root_hash = self.get_post_state_hash();
         self.engine_state
             .get_system_mint_hash(correlation_id, state_root_hash)
-            .expect("should have auction hash")
+            .expect("should have auction hash") //?expect
     }
 
     /// Gets the [`ContractHash`] of the system handle payment contract, panics if it can't be
@@ -1164,7 +1167,7 @@ where
         let state_root_hash = self.get_post_state_hash();
         self.engine_state
             .get_handle_payment_hash(correlation_id, state_root_hash)
-            .expect("should have handle payment hash")
+            .expect("should have handle payment hash") //?expect
     }
 
     /// Returns the [`ContractHash`] of the system standard payment contract, panics if it can't be
@@ -1174,7 +1177,7 @@ where
         let state_root_hash = self.get_post_state_hash();
         self.engine_state
             .get_standard_payment_hash(correlation_id, state_root_hash)
-            .expect("should have standard payment hash")
+            .expect("should have standard payment hash") //?expect
     }
 
     /// Resets the `exec_results`, `upgrade_results` and `transform` fields.

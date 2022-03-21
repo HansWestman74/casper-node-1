@@ -366,7 +366,7 @@ impl DeployAcceptor {
             // Balance checks for deploys received by from a peer will cause the network
             // to stall.
             // TODO: Change this to a fatal!
-            panic!("Balance checks for deploys received from peers should never occur.")
+            panic!("Balance checks for deploys received from peers should never occur.") //?panic
         }
         match maybe_balance_value {
             None => {

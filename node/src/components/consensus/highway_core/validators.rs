@@ -153,7 +153,7 @@ impl<VID: Ord + Hash + Clone, W: Into<Weight>> FromIterator<(VID, W)> for Valida
         let mut validators: Vec<_> = ii.into_iter().map(Validator::from).collect();
         let total_weight = validators.iter().fold(Weight(0), |sum, v| {
             sum.checked_add(v.weight())
-                .expect("total weight must be < 2^64")
+                .expect("total weight must be < 2^64") //?expect
         });
         validators.sort_by_cached_key(|val| val.id.clone());
         let index_by_id = validators

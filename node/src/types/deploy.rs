@@ -85,7 +85,7 @@ static DEPLOY: Lazy<Deploy> = Lazy::new(|| {
             1185c961daee1adab0649912a6477bcd2e69bd91bd08"
             .as_bytes(),
     )
-    .unwrap();
+    .unwrap(); //?unwrap
     let approval = Approval {
         signer: PublicKey::from(secret_key),
         signature,
@@ -1292,17 +1292,17 @@ impl DocExample for Deploy {
 fn serialize_header(header: &DeployHeader) -> Vec<u8> {
     header
         .to_bytes()
-        .unwrap_or_else(|error| panic!("should serialize deploy header: {}", error))
+        .unwrap_or_else(|error| panic!("should serialize deploy header: {}", error)) //?panic
 }
 
 fn serialize_body(payment: &ExecutableDeployItem, session: &ExecutableDeployItem) -> Vec<u8> {
     let mut buffer = payment
         .to_bytes()
-        .unwrap_or_else(|error| panic!("should serialize payment code: {}", error));
+        .unwrap_or_else(|error| panic!("should serialize payment code: {}", error)); //?panic
     buffer.extend(
         session
             .to_bytes()
-            .unwrap_or_else(|error| panic!("should serialize session code: {}", error)),
+            .unwrap_or_else(|error| panic!("should serialize session code: {}", error)), //?panic
     );
     buffer
 }

@@ -19,7 +19,7 @@ impl AdditiveMapDiff {
         for key in left.keys().copied().collect::<Vec<_>>() {
             // NOTE: Safe to unwrap here since we're iterating `left` keys, so `left.remove` must
             // succeed.
-            let left_value = left.remove(&key).unwrap();
+            let left_value = left.remove(&key).unwrap(); //?unwrap
             if let Some(right_value) = right.remove(&key) {
                 if left_value == right_value {
                     both.insert(key, left_value);

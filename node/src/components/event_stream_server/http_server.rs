@@ -70,17 +70,17 @@ pub(super) async fn run(
                                 .next()
                                 .map(|event| {
                                     //? Safe?  Above ServerSentEvent::initial_event creates an event with id=None. Where is it being set to Some(id)??;
-                                    let id = event.id.expect("even should have id");
+                                    let id = event.id.expect("even should have id");//?expect
                                     id > Id::MAX - buffer_size || id < buffer_size
                                 })
                                 .unwrap_or_default();
                             for event in buffer.iter().skip_while(|event| {
                                 if in_wraparound_zone {
-                                    event.id.expect("should have id").wrapping_add(buffer_size)
+                                    event.id.expect("should have id").wrapping_add(buffer_size)//?expect
                                         < start_index.wrapping_add(buffer_size)
                                 } else {
                                     //? Safe?  Above ServerSentEvent::initial_event creates an event with id=None. Where is it being set to Some(id)??;
-                                    event.id.expect("should have id") < start_index
+                                    event.id.expect("should have id") < start_index//?expect
                                 }
                             }) {
                                 // As per sending `SSE_INITIAL_EVENT`, we don't care if this errors.

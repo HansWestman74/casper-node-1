@@ -41,7 +41,7 @@ impl ExecuteRequestBuilder {
     pub fn with_pre_state_hash(mut self, pre_state_hash: &[u8]) -> Self {
         self.execute_request.parent_state_hash = pre_state_hash
             .try_into()
-            .expect("failed to create digest from u8 slice");
+            .expect("failed to create digest from u8 slice"); //?expect
         self
     }
 

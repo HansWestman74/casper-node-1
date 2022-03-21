@@ -35,7 +35,7 @@ pub fn sign<T: AsRef<[u8]>>(
 ) -> Signature {
     match (secret_key, public_key) {
         (SecretKey::System, PublicKey::System) => {
-            panic!("cannot create signature with system keys",)
+            panic!("cannot create signature with system keys",) //?panic
         }
         (SecretKey::Ed25519(secret_key), PublicKey::Ed25519(public_key)) => {
             let expanded_secret_key = ExpandedSecretKey::from(secret_key);
@@ -46,10 +46,10 @@ pub fn sign<T: AsRef<[u8]>>(
             let signer = secret_key;
             let signature: Secp256k1Signature = signer
                 .try_sign(message.as_ref())
-                .expect("should create signature");
+                .expect("should create signature"); //?expect
             Signature::Secp256k1(signature)
         }
-        _ => panic!("secret and public key types must match"),
+        _ => panic!("secret and public key types must match"), //?panic
     }
 }
 

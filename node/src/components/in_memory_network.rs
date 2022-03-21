@@ -366,13 +366,13 @@ where
     /// Panics if the internal lock has been poisoned, a network with the wrong type of message was
     /// removed or if there was no network at at all.
     pub(crate) fn remove_active() {
-        //? Change assert-->debug_assert+error! ?
+        //?assert
         assert!(
             ACTIVE_NETWORK.with(|active_network| {
                 active_network
                     .borrow_mut()
                     .take()
-                    .expect("tried to remove non-existent network")
+                    .expect("tried to remove non-existent network") //?expect
                     .is::<Self>()
             }),
             "removed network was of wrong type"
@@ -396,9 +396,9 @@ where
             active_network
                 .borrow_mut()
                 .as_mut()
-                .expect("tried to create node without active network set")
+                .expect("tried to create node without active network set") //?expect
                 .downcast_mut::<Self>()
-                .expect("active network has wrong message type")
+                .expect("active network has wrong message type") //?expect
                 .create_node_local(event_queue, rng)
         })
     }
@@ -414,12 +414,12 @@ where
             if let Some(active_network) = active_network.borrow_mut().as_mut() {
                 active_network
                     .downcast_mut::<Self>()
-                    .expect("active network has wrong message type")
+                    .expect("active network has wrong message type") //?expect
                     .nodes
                     .write()
-                    .expect("poisoned lock")
+                    .expect("poisoned lock") //?expect
                     .remove(node_id)
-                    .expect("node doesn't exist in network");
+                    .expect("node doesn't exist in network"); //?expect
             }
         })
     }
@@ -476,8 +476,9 @@ where
 
         // Sanity check, ensure that we do not create duplicate nodes.
         {
-            let mut nodes_write = nodes.write().expect("network lock poisoned");
-            //? Change assert-->debug_assert+error! ?
+            let mut nodes_write = nodes.write().expect("network lock poisoned"); //?expect
+
+            //?assert
             assert!(
                 !nodes_write.contains_key(&node_id),
                 "nodes_write should not contain key"
@@ -509,7 +510,7 @@ where
         payload: P,
     ) {
         if dest == self.node_id {
-            panic!("can't send message to self");
+            panic!("can't send message to self"); //?panic
         }
 
         match nodes.get(&dest) {
@@ -545,7 +546,7 @@ where
                 responder,
             } => {
                 if *dest == self.node_id {
-                    panic!("can't send message to self");
+                    panic!("can't send message to self"); //?panic
                 }
 
                 if let Ok(guard) = self.nodes.read() {

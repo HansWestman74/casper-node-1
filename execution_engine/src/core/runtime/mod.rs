@@ -1026,7 +1026,8 @@ where
         }
 
         // NOTE: Safe to unwrap as we have checked if stack is empty just above
-        if stack.first_frame().unwrap().contract_hash().is_some() {
+        if stack.first_frame().unwrap().contract_hash().is_some() {//?unwrap
+            //?unwrap
             error!("First element of the call stack should always represent a Session call");
             debug_assert!(false);
         }
@@ -1192,7 +1193,7 @@ where
         let bytes_size: u32 = key_bytes
             .len()
             .try_into()
-            .expect("Keys should not serialize to many bytes");
+            .expect("Keys should not serialize to many bytes"); //?expect
         let size_bytes = bytes_size.to_le_bytes(); // Wasm is little-endian
         if let Err(error) = self.memory.set(bytes_written_ptr, &size_bytes) {
             return Err(Error::Interpreter(error.into()).into());
@@ -2656,7 +2657,7 @@ where
             let bytes_size: u32 = key_bytes
                 .len()
                 .try_into()
-                .expect("Serialized value should fit within the limit");
+                .expect("Serialized value should fit within the limit"); //?expect
             let size_bytes = bytes_size.to_le_bytes(); // Wasm is little-endian
             if let Err(error) = self.memory.set(bytes_written_ptr, &size_bytes) {
                 return Err(Error::Interpreter(error.into()));
@@ -3354,7 +3355,7 @@ where
         let bytes_written: u32 = sliced_buf
             .len()
             .try_into()
-            .expect("Size of buffer should fit within limit");
+            .expect("Size of buffer should fit within limit"); //?expect
         let bytes_written_data = bytes_written.to_le_bytes();
 
         if let Err(error) = self.memory.set(bytes_written_ptr, &bytes_written_data) {
@@ -3389,7 +3390,7 @@ where
                 arg.inner_bytes()
                     .len()
                     .try_into()
-                    .expect("Should fit within the range")
+                    .expect("Should fit within the range") //?expect
             }
             None => return Ok(Err(ApiError::MissingArgument)),
         };

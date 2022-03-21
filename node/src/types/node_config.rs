@@ -38,7 +38,7 @@ impl Default for NodeConfig {
             max_parallel_deploy_fetches: DEFAULT_MAX_PARALLEL_DEPLOY_FETCHES,
             max_parallel_trie_fetches: DEFAULT_MAX_PARALLEL_TRIE_FETCHES,
             // NOTE: Safe to unwrap as DEFAULT_RETRY_INTERVAL is correct
-            retry_interval: DEFAULT_RETRY_INTERVAL.parse().unwrap(),
+            retry_interval: DEFAULT_RETRY_INTERVAL.parse().unwrap(), //?unwrap
             archival_sync: false,
         }
     }

@@ -76,7 +76,7 @@ impl<C: Context> Unit<C> {
             // `pre_validate_unit` checks that the panorama has a `Correct` entry.
             fork_choice
                 .cloned()
-                .expect("nonempty panorama has nonempty fork choice")
+                .expect("nonempty panorama has nonempty fork choice") //?expect
         };
         let mut skip_idx = Vec::new();
         if let Some(hash) = wunit.panorama[wunit.creator].correct() {

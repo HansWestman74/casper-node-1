@@ -49,7 +49,7 @@ static GET_ITEM_PARAMS: Lazy<GetItemParams> = Lazy::new(|| GetItemParams {
 static GET_ITEM_RESULT: Lazy<GetItemResult> = Lazy::new(|| GetItemResult {
     api_version: DOCS_EXAMPLE_PROTOCOL_VERSION,
     // NOTE: Safe to unwrap we feed it correct u64
-    stored_value: StoredValue::CLValue(CLValue::from_t(1u64).unwrap()),
+    stored_value: StoredValue::CLValue(CLValue::from_t(1u64).unwrap()), //?unwrap
     merkle_proof: MERKLE_PROOF.clone(),
 });
 static GET_BALANCE_PARAMS: Lazy<GetBalanceParams> = Lazy::new(|| GetBalanceParams {
@@ -71,7 +71,7 @@ static GET_AUCTION_INFO_RESULT: Lazy<GetAuctionInfoResult> = Lazy::new(|| GetAuc
 });
 static GET_ACCOUNT_INFO_PARAMS: Lazy<GetAccountInfoParams> = Lazy::new(|| {
     // NOTE: Safe to unwrap we feed it correct length
-    let secret_key = SecretKey::ed25519_from_bytes([0; 32]).unwrap();
+    let secret_key = SecretKey::ed25519_from_bytes([0; 32]).unwrap(); //?unwrap
     let public_key = PublicKey::from(&secret_key);
     GetAccountInfoParams {
         public_key,
@@ -99,7 +99,7 @@ static GET_DICTIONARY_ITEM_RESULT: Lazy<GetDictionaryItemResult> =
             "dictionary-67518854aa916c97d4e53df8570c8217ccc259da2721b692102d76acd0ee8d1f"
                 .to_string(),
         // NOTE: Safe to unwrap we feed it correct u64
-        stored_value: StoredValue::CLValue(CLValue::from_t(1u64).unwrap()),
+        stored_value: StoredValue::CLValue(CLValue::from_t(1u64).unwrap()), //?unwrap
         merkle_proof: MERKLE_PROOF.clone(),
     });
 static QUERY_GLOBAL_STATE_PARAMS: Lazy<QueryGlobalStateParams> =

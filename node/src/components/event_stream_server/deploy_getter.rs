@@ -80,7 +80,7 @@ impl DeployGetter {
             };
 
         if maybe_deploys.len() != 1 {
-            panic!("should return exactly one deploy");
+            panic!("should return exactly one deploy"); //?panic
         }
         maybe_deploys.pop().unwrap()
     }

@@ -107,6 +107,7 @@ impl<C: Context + 'static> HighwayProtocol<C> {
         let validators_count = validator_stakes.len();
         let sum_stakes: U512 = validator_stakes.iter().map(|(_, stake)| *stake).sum();
         // NOTE: A total weight = 0 will prevent anything from being finalized.
+        //?assert
         assert!(
             !sum_stakes.is_zero(),
             "cannot start era with total weight 0"
@@ -128,7 +129,7 @@ impl<C: Context + 'static> HighwayProtocol<C> {
             validators.set_cannot_propose(vid);
         }
 
-        //? Change assert-->debug_assert+error! ?
+        //?assert
         assert!(
             validators.ensure_nonzero_proposing_stake(),
             "cannot start era with total weight 0"
@@ -138,7 +139,7 @@ impl<C: Context + 'static> HighwayProtocol<C> {
 
         let total_weight = u128::from(validators.total_weight());
         let ftt_fraction = highway_config.finality_threshold_fraction;
-
+        //?assert
         assert!(
             ftt_fraction < 1.into(),
             "fault tolerance threshold must be less than 100%"
@@ -283,7 +284,7 @@ impl<C: Context + 'static> HighwayProtocol<C> {
                 .highway
                 .validators()
                 .id(ev.perpetrator())
-                .expect("validator not found") // We already validated this vertex.
+                .expect("validator not found") //?expect // We already validated this vertex.
                 .clone();
             outcomes.push(ProtocolOutcome::NewEvidence(v_id));
         }
@@ -688,7 +689,7 @@ impl<C: Context + 'static> HighwayProtocol<C> {
                         .filter_map(|seq_num| {
                             let unit = state
                                 .find_in_swimlane(hash, seq_num)
-                                .expect("find_in_swimlane should find hash");
+                                .expect("find_in_swimlane should find hash"); //?expect
                             state
                                 .wire_unit(unit, *self.highway.instance_id())
                                 .map(|swu| HighwayMessage::NewVertex(Vertex::Unit(swu)))
@@ -726,7 +727,7 @@ pub(crate) enum HighwayMessage<C: Context> {
 
 impl<C: Context> HighwayMessage<C> {
     pub(crate) fn serialize(&self) -> Vec<u8> {
-        bincode::serialize(self).expect("should serialize message")
+        bincode::serialize(self).expect("should serialize message") //?expect
     }
 }
 

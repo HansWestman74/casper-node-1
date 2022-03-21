@@ -91,10 +91,10 @@ where
     V: 'static + Send,
 {
     // This will never panic since the semaphore is never closed.
-    let _permit = INTENSIVE_TASKS_SEMAPHORE.acquire().await.unwrap();
+    let _permit = INTENSIVE_TASKS_SEMAPHORE.acquire().await.unwrap(); //?unwrap
     tokio::task::spawn_blocking(task)
         .await
-        .expect("task panicked")
+        .expect("task panicked") //?expect
 }
 
 /// State to use to construct the next block in the blockchain. Includes the state root hash for the
@@ -465,7 +465,7 @@ impl ContractRuntime {
                 if self
                     .execution_pre_state
                     .lock()
-                    .expect("execution_pre_state lock should not be poisoned")
+                    .expect("execution_pre_state lock should not be poisoned") //?expect
                     .next_block_height
                     == finalized_block.height()
                 {
@@ -487,7 +487,7 @@ impl ContractRuntime {
                 } else {
                     exec_queue
                         .lock()
-                        .expect("execution_queue lock should not be poisoned")
+                        .expect("execution_queue lock should not be poisoned") //?expect
                         .insert(
                             finalized_block.height(),
                             (finalized_block, deploys, transfers),
@@ -651,7 +651,7 @@ impl ContractRuntime {
         *self
             .execution_pre_state
             .lock()
-            .expect("execution_pre_state should not be poisoned") = sequential_block_state;
+            .expect("execution_pre_state should not be poisoned") = sequential_block_state; //?expect
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -674,7 +674,7 @@ impl ContractRuntime {
     {
         let current_execution_pre_state = execution_pre_state
             .lock()
-            .expect("execution_pre_state lock should not be poisoned")
+            .expect("execution_pre_state lock should not be poisoned") //?expect
             .clone();
         let BlockAndExecutionEffects {
             block,
@@ -704,7 +704,7 @@ impl ContractRuntime {
         );
         *execution_pre_state
             .lock()
-            .expect("execution_pre_state lock should not be poisoned") =
+            .expect("execution_pre_state lock should not be poisoned") =//?expect
             new_execution_pre_state.clone();
 
         let current_era_id = block.header().era_id();
@@ -730,7 +730,7 @@ impl ContractRuntime {
         // If the child is already finalized, start execution.
         let next_block = {
             // needed to help this async block impl Send (the MutexGuard lives too long)
-            let queue = &mut *exec_queue.lock().expect("mutex poisoned");
+            let queue = &mut *exec_queue.lock().expect("mutex poisoned"); //?expect
             queue.remove(&new_execution_pre_state.next_block_height)
         };
         if let Some((finalized_block, deploys, transfers)) = next_block {

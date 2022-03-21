@@ -137,7 +137,7 @@ impl<VID> EraReport<VID> {
             VID: ToBytes,
         {
             Digest::hash_merkle_tree(slice_of_validators.iter().map(|validator| {
-                Digest::hash(validator.to_bytes().expect("Could not serialize validator"))
+                Digest::hash(validator.to_bytes().expect("Could not serialize validator")) //?expect
             }))
         }
 
@@ -150,7 +150,7 @@ impl<VID> EraReport<VID> {
 
         let hashed_equivocators = hash_slice_of_validators(equivocators);
         let hashed_inactive_validators = hash_slice_of_validators(inactive_validators);
-        let hashed_rewards = Digest::hash_btree_map(rewards).expect("Could not hash rewards");
+        let hashed_rewards = Digest::hash_btree_map(rewards).expect("Could not hash rewards"); //?expect
 
         Digest::hash_slice_rfold(&[
             hashed_equivocators,

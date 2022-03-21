@@ -135,7 +135,7 @@ where
                     |is_bonded| Event::IsBonded(known_fs, new_fs, is_bonded),
                     |error| {
                         error!(%error, "checking in future eras returned an error.");
-                        panic!("couldn't check if validator is bonded")
+                        panic!("couldn't check if validator is bonded") //?panic
                     },
                 ),
         })

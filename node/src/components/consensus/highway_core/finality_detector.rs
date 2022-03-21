@@ -41,6 +41,7 @@ where
 
 impl<C: Context> FinalityDetector<C> {
     pub(crate) fn new(ftt: Weight) -> Self {
+        //?assert
         assert!(
             ftt > Weight(0),
             "fault tolerance threshold should not be zero"
@@ -66,7 +67,7 @@ impl<C: Context> FinalityDetector<C> {
         Ok(iter::from_fn(move || {
             let bhash = self.next_finalized(state)?;
             // NOTE: Safe to unwrap: Index exists, since we have units from them.
-            let to_id = |vidx: ValidatorIndex| highway.validators().id(vidx).unwrap().clone();
+            let to_id = |vidx: ValidatorIndex| highway.validators().id(vidx).unwrap().clone(); //?unwrap
             let block = state.block(bhash);
             let unit = state.unit(bhash);
             let terminal_block_data = state
@@ -180,7 +181,7 @@ impl<C: Context> FinalityDetector<C> {
         highway: &Highway<C>,
     ) -> TerminalBlockData<C> {
         // NOTE: Safe to unwrap: Index exists, since we have units from them.
-        let to_id = |vidx: ValidatorIndex| highway.validators().id(vidx).unwrap().clone();
+        let to_id = |vidx: ValidatorIndex| highway.validators().id(vidx).unwrap().clone(); //?unwrap
         let state = highway.state();
 
         // Compute the rewards, and replace each validator index with the validator ID.
@@ -191,7 +192,7 @@ impl<C: Context> FinalityDetector<C> {
         // Report inactive validators, but only if they had sufficient time to create a unit, i.e.
         // if at least one maximum-length round passed between the first and last block.
         // NOTE: Safe to unwrap: Ancestor at height 0 always exists.
-        let first_bhash = state.find_ancestor_proposal(bhash, 0).unwrap();
+        let first_bhash = state.find_ancestor_proposal(bhash, 0).unwrap(); //?unwrap
         let sufficient_time_for_activity =
             unit.timestamp >= state.unit(first_bhash).timestamp + state.params().max_round_length();
         let inactive_validators = if sufficient_time_for_activity {

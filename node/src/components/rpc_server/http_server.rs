@@ -37,12 +37,12 @@ fn new_error_response(error: warp_json_rpc::Error) -> Response<Body> {
     };
 
     // NOTE: Safe to unwrap as json_response is correct
-    let body = Body::from(serde_json::to_vec(&json_response).unwrap());
+    let body = Body::from(serde_json::to_vec(&json_response).unwrap()); //?unwrap
     Response::builder()
         .status(StatusCode::OK)
         .header("Content-Type", "application/json")
         .body(body)
-        .expect("builder faild to produce Response<body>")
+        .expect("builder faild to produce Response<body>") //?expect
 }
 
 /// Run the JSON-RPC server.

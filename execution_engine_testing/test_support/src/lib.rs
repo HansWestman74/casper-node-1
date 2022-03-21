@@ -73,7 +73,7 @@ pub static DEFAULT_GENESIS_CONFIG_HASH: Lazy<Digest> = Lazy::new(|| [42; 32].int
 /// Default account public key.
 pub static DEFAULT_ACCOUNT_PUBLIC_KEY: Lazy<PublicKey> = Lazy::new(|| {
     // NOTE: Safe to unwrap as ED25519_LENGTH is correct length
-    let secret_key = SecretKey::ed25519_from_bytes([199; SecretKey::ED25519_LENGTH]).unwrap();
+    let secret_key = SecretKey::ed25519_from_bytes([199; SecretKey::ED25519_LENGTH]).unwrap(); //?unwrap
     PublicKey::from(&secret_key)
 });
 /// Default test account address.

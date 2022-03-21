@@ -114,7 +114,7 @@ impl<T> WorkQueue<T> {
         loop {
             let waiting;
             {
-                let mut jobs = self.jobs.lock().expect("lock poisoned");
+                let mut jobs = self.jobs.lock().expect("lock poisoned"); //?expect
                 match jobs.pop_front() {
                     Some(job) => {
                         // We got a job, increase the `in_progress` count and return.
@@ -151,7 +151,7 @@ impl<T> WorkQueue<T> {
     ///
     /// If there are any worker waiting on `next_job`, one of them will receive the job.
     pub fn push_job(&self, job: T) {
-        let mut guard = self.jobs.lock().expect("lock poisoned");
+        let mut guard = self.jobs.lock().expect("lock poisoned"); //?expect
 
         guard.push_back(job);
         self.notify.notify_waiters();
@@ -178,7 +178,7 @@ impl<T> WorkQueue<T> {
         // about the completion of what might appear to be the last job. This also prevents workers
         // starving in the case of the last job being completed while they are checking for more
         // work.
-        let _guard = self.jobs.lock().expect("lock poisoned");
+        let _guard = self.jobs.lock().expect("lock poisoned"); //?expect
 
         self.in_progress.fetch_sub(1, Ordering::SeqCst);
         self.notify.notify_waiters();

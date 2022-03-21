@@ -31,13 +31,13 @@ const EC_PUBLIC_KEY_OBJECT_IDENTIFIER: [u8; 7] = [42, 134, 72, 206, 61, 2, 1];
 static ED25519_SECRET_KEY: Lazy<SecretKey> = Lazy::new(|| {
     let bytes = [15u8; SecretKey::ED25519_LENGTH];
     // NOTE: Safe to unwrap as ED25519_LENGTH is correct length
-    SecretKey::ed25519_from_bytes(bytes).unwrap()
+    SecretKey::ed25519_from_bytes(bytes).unwrap() //?unwrap
 });
 
 static ED25519_PUBLIC_KEY: Lazy<PublicKey> = Lazy::new(|| {
     let bytes = [15u8; SecretKey::ED25519_LENGTH];
     // NOTE: Safe to unwrap as ED25519_LENGTH is correct length
-    let secret_key = SecretKey::ed25519_from_bytes(bytes).unwrap();
+    let secret_key = SecretKey::ed25519_from_bytes(bytes).unwrap(); //?unwrap
     PublicKey::from(&secret_key)
 });
 
@@ -290,13 +290,13 @@ impl AsymmetricKeyExt for SecretKey {
 impl AsymmetricKeyExt for PublicKey {
     fn generate_ed25519() -> Result<Self, Error> {
         let mut bytes = [0u8; Self::ED25519_LENGTH];
-        getrandom::getrandom(&mut bytes[..]).expect("RNG failure!");
+        getrandom::getrandom(&mut bytes[..]).expect("RNG failure!"); //?expect
         PublicKey::ed25519_from_bytes(bytes).map_err(Into::into)
     }
 
     fn generate_secp256k1() -> Result<Self, Error> {
         let mut bytes = [0u8; Self::SECP256K1_LENGTH];
-        getrandom::getrandom(&mut bytes[..]).expect("RNG failure!");
+        getrandom::getrandom(&mut bytes[..]).expect("RNG failure!"); //?expect
         PublicKey::secp256k1_from_bytes(bytes).map_err(Into::into)
     }
 

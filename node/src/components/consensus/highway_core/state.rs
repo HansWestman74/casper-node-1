@@ -207,7 +207,7 @@ impl<C: Context> State<C> {
         IB2: IntoIterator<Item = ValidatorIndex>,
     {
         let weights = ValidatorMap::from(weights.into_iter().map(|w| *w.borrow()).collect_vec());
-        //? Change assert-->debug_assert+error! ?
+        //?assert
         assert!(
             weights.len() > 0,
             "cannot initialize Highway with no validators"
@@ -215,21 +215,21 @@ impl<C: Context> State<C> {
 
         let sums = |mut sums: Vec<Weight>, w: Weight| {
             let sum = sums.last().copied().unwrap_or(Weight(0));
-            sums.push(sum.checked_add(w).expect("total weight must be < 2^64"));
+            sums.push(sum.checked_add(w).expect("total weight must be < 2^64")); //?expect
             sums
         };
         let cumulative_w = ValidatorMap::from(weights.iter().copied().fold(vec![], sums));
-        //? Change assert-->debug_assert+error! ?
+        //?assert
         assert!(
             // NOTE: Unwrap safe as we have tested above that weights have length > 0
-            *cumulative_w.as_ref().last().unwrap() > Weight(0),
+            *cumulative_w.as_ref().last().unwrap() > Weight(0), //?unwrap
             "total weight must not be zero"
         );
 
         let mut panorama = Panorama::new(weights.len());
         let mut can_propose: ValidatorMap<bool> = weights.iter().map(|_| true).collect();
         for idx in cannot_propose {
-            //? Change assert-->debug_assert+error! ?
+            //?assert
             assert!(
                 idx.0 < weights.len() as u32,
                 "invalid validator index for exclusion from leader sequence"
@@ -238,7 +238,7 @@ impl<C: Context> State<C> {
         }
         let faults: HashMap<_, _> = banned.into_iter().map(|idx| (idx, Fault::Banned)).collect();
         for idx in faults.keys() {
-            //? Change assert-->debug_assert+error! ?
+            //?assert
             assert!(
                 idx.0 < weights.len() as u32,
                 "invalid banned validator index"
@@ -311,7 +311,7 @@ impl<C: Context> State<C> {
             .cumulative_w
             .as_ref()
             .last()
-            .expect("weight list cannot be empty")
+            .expect("weight list cannot be empty") //?expect
     }
 
     /// Returns evidence against validator nr. `idx`, if present.
@@ -406,7 +406,7 @@ impl<C: Context> State<C> {
 
     /// Returns the unit with the given hash. Panics if not found.
     pub(crate) fn unit(&self, hash: &C::Hash) -> &Unit<C> {
-        self.maybe_unit(hash).expect("unit hash must exist")
+        self.maybe_unit(hash).expect("unit hash must exist") //?expect
     }
 
     /// Returns the block contained in the unit with the given hash, if present.
@@ -416,7 +416,7 @@ impl<C: Context> State<C> {
 
     /// Returns the block contained in the unit with the given hash. Panics if not found.
     pub(crate) fn block(&self, hash: &C::Hash) -> &Block<C> {
-        self.maybe_block(hash).expect("block hash must exist")
+        self.maybe_block(hash).expect("block hash must exist") //?expect
     }
 
     /// Returns the complete protocol state's latest panorama.
@@ -436,9 +436,9 @@ impl<C: Context> State<C> {
         // we want the tests to panic but production to pick a default.
         let panic_or_0 = || {
             if cfg!(test) {
-                panic!("random number out of range");
+                panic!("random number out of range"); //?panic
             } else {
-                error!("random number out of range");
+                error!("random number out of range"); //?panic
                 ValidatorIndex(0)
             }
         };
@@ -462,7 +462,7 @@ impl<C: Context> State<C> {
             .cumulative_w_leaders
             .as_ref()
             .last()
-            .expect("cumulative_w_leaders should have at least one member");
+            .expect("cumulative_w_leaders should have at least one member"); //?expect
         let r = Weight(leader_prng(total_w_leaders.0, seed.wrapping_add(1)));
         self.cumulative_w_leaders
             .binary_search(&r)
@@ -495,7 +495,7 @@ impl<C: Context> State<C> {
         let new_obs = match (&self.panorama[creator], &unit.panorama[creator]) {
             (Observation::Faulty, _) => Observation::Faulty,
             (obs0, obs1) if obs0 == obs1 => Observation::Correct(hash),
-            (Observation::None, _) => panic!("missing creator's previous unit"),
+            (Observation::None, _) => panic!("missing creator's previous unit"), //?panic
             (Observation::Correct(hash0), _) => {
                 // We have all dependencies of unit, but it does not cite hash0 as its predecessor,
                 // which is our latest known unit by the creator. It must therefore cite an older
@@ -504,13 +504,13 @@ impl<C: Context> State<C> {
                 // the same sequence number.
                 let prev0 = self
                     .find_in_swimlane(hash0, unit.seq_number)
-                    .expect("find_in_swim_lane should find hash");
+                    .expect("find_in_swim_lane should find hash"); //?expect
                 let wunit0 = self
                     .wire_unit(prev0, instance_id)
-                    .expect("should have SignedWireUnit");
+                    .expect("should have SignedWireUnit"); //?expect
                 let wunit1 = self
                     .wire_unit(&hash, instance_id)
-                    .expect("should have SignedWireUnit");
+                    .expect("should have SignedWireUnit"); //?expect
                 self.add_evidence(Evidence::Equivocation(wunit0, wunit1));
                 Observation::Faulty
             }
@@ -563,7 +563,7 @@ impl<C: Context> State<C> {
         if endorsed > threshold {
             info!(%uhash, "Unit endorsed by at least 1/2 of validators.");
             // NOTE: Unwrap is safe: We created the map entry above.
-            let mut fully_endorsed = self.incomplete_endorsements.remove(&uhash).unwrap();
+            let mut fully_endorsed = self.incomplete_endorsements.remove(&uhash).unwrap(); //?unwrap
             let endorsed_map = self
                 .weights()
                 .keys()
@@ -681,18 +681,18 @@ impl<C: Context> State<C> {
                     .take_while(|(_, pred2)| pred2.seq_number >= unit1.seq_number)
                     .map(|(pred2_hash, _)| {
                         self.wire_unit(pred2_hash, *instance_id)
-                            .expect("should have SignedWireUnit")
+                            .expect("should have SignedWireUnit") //?expect
                     })
                     .collect();
                 Evidence::Endorsements {
                     endorsement1: SignedEndorsement::new(Endorsement::new(*uhash1, vidx), *sig1),
                     unit1: self
                         .wire_unit(uhash1, *instance_id)
-                        .expect("should have SignedWireUnit"),
+                        .expect("should have SignedWireUnit"), //?expect
                     endorsement2: SignedEndorsement::new(Endorsement::new(*uhash2, vidx), *sig2),
                     unit2: self
                         .wire_unit(uhash2, *instance_id)
-                        .expect("should have SignedWireUnit"),
+                        .expect("should have SignedWireUnit"), //?expect
                     swimlane2,
                 }
             })

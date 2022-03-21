@@ -250,7 +250,7 @@ impl TrieFetcher {
             // NOTE: Safe to unwrap since we just inserted a value at this key
             self.partial_chunks
                 .get_mut(hash)
-                .unwrap()
+                .unwrap() //?unwrap
                 .merge(old_partial_chunks);
         }
         effect_builder

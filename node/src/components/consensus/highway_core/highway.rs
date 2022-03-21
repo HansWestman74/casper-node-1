@@ -362,7 +362,7 @@ impl<C: Context> Highway<C> {
                     GetDepOutcome::Vertex(ValidVertex(Vertex::Evidence(ev.clone())))
                 }
                 Some(Fault::Indirect) => {
-                    let vid = self.validators.id(*idx).expect("missing validator").clone();
+                    let vid = self.validators.id(*idx).expect("missing validator").clone(); //?expect
                     GetDepOutcome::Evidence(vid)
                 }
             },

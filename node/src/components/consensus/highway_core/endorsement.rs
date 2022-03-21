@@ -46,7 +46,7 @@ impl<C: Context> Endorsement<C> {
 
     pub(crate) fn hash(&self) -> C::Hash {
         <C as Context>::hash(
-            &bincode::serialize(&(self.unit, self.creator)).expect("serialize endorsement"),
+            &bincode::serialize(&(self.unit, self.creator)).expect("serialize endorsement"),//?expect
         )
     }
 }

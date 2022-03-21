@@ -371,7 +371,7 @@ impl Executor {
         let system_contract_registry = tracking_copy
             .borrow_mut()
             .get_system_contracts(correlation_id)
-            .unwrap_or_else(|error| panic!("Could not retrieve system contracts: {:?}", error));
+            .unwrap_or_else(|error| panic!("Could not retrieve system contracts: {:?}", error)); //?panic
 
         match direct_system_contract_call {
             DirectSystemContractCall::Slash
@@ -380,11 +380,12 @@ impl Executor {
                 // TODO See if these panics can be removed.
                 let auction_hash = system_contract_registry
                     .get(AUCTION)
-                    .expect("should have auction hash")
+                    .expect("should have auction hash") //?expect
                     .to_owned();
 
                 if Some(auction_hash.value()) != base_key.into_hash() {
                     panic!(
+                        //?panic
                         "{} should only be called with the auction contract",
                         direct_system_contract_call.entry_point_name()
                     );
@@ -395,9 +396,10 @@ impl Executor {
                 // TODO See if these panics can be removed.
                 let handle_payment = system_contract_registry
                     .get(HANDLE_PAYMENT)
-                    .expect("should have handle payment");
+                    .expect("should have handle payment"); //?expect
                 if Some(handle_payment.value()) != base_key.into_hash() {
                     panic!(
+                        //?panic
                         "{} should only be called with the handle payment contract",
                         direct_system_contract_call.entry_point_name()
                     );
@@ -407,9 +409,10 @@ impl Executor {
                 // TODO See if these panics can be removed.
                 let mint_hash = system_contract_registry
                     .get(MINT)
-                    .expect("should have mint hash");
+                    .expect("should have mint hash"); //?expect
                 if Some(mint_hash.value()) != base_key.into_hash() {
                     panic!(
+                        //?panic
                         "{} should only be called with the mint contract",
                         direct_system_contract_call.entry_point_name()
                     );
@@ -419,10 +422,11 @@ impl Executor {
                 // TODO See if these panics can be removed.
                 let auction_hash = system_contract_registry
                     .get(AUCTION)
-                    .expect("should have auction hash")
+                    .expect("should have auction hash") //?expect
                     .to_owned();
                 if Some(auction_hash.value()) != base_key.into_hash() {
                     panic!(
+                        //?panic
                         "{} should only be called with the auction contract",
                         direct_system_contract_call.entry_point_name()
                     );

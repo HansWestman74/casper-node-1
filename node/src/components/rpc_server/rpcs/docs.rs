@@ -217,7 +217,7 @@ impl OpenRpcSchema {
     ///
     /// As per the standard, the required params must be sorted before the optional ones.
     fn make_params(schema: Schema) -> Vec<SchemaParam> {
-        let schema_object = schema.into_object().object.expect("should be object");
+        let schema_object = schema.into_object().object.expect("should be object"); //?expect
         let mut required_params = schema_object
             .properties
             .iter()
@@ -248,7 +248,7 @@ impl OpenRpcSchema {
     /// Since all params must be unanimously optional, mark all incorrectly tagged "required" fields
     /// as false.
     fn make_optional_params(schema: Schema) -> Vec<SchemaParam> {
-        let schema_object = schema.into_object().object.expect("should be object");
+        let schema_object = schema.into_object().object.expect("should be object"); //?expect
         schema_object
             .properties
             .iter()
@@ -269,7 +269,7 @@ impl OpenRpcSchema {
         for (key, value) in root_schema.definitions.drain(..) {
             match self.components.schemas.entry(key) {
                 MapEntry::Occupied(current_value) => {
-                    //? Change assert-->debug_assert+error! ?
+                    //?assert_eq
                     assert_eq!(
                         current_value.get().clone().into_object().metadata,
                         value.into_object().metadata,
@@ -354,7 +354,7 @@ impl Example {
         let params = match maybe_params_obj {
             Some(params_obj) => params_obj
                 .as_object()
-                .expect("params_obj should be Object")
+                .expect("params_obj should be Object") //?expect
                 .iter()
                 .map(|(name, value)| ExampleParam {
                     name: name.clone(),
@@ -502,7 +502,7 @@ mod tests {
             },
         };
         let params = schema.give_params_schema::<T>();
-        let schema_object = params.into_object().object.expect("should be object");
+        let schema_object = params.into_object().object.expect("should be object"); //?expect
         schema_object
             .properties
             .iter()

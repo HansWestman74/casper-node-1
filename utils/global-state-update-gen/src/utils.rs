@@ -11,9 +11,9 @@ use casper_types::{
 
 /// Parses a Digest from a string. Panics if parsing fails.
 pub fn hash_from_str(hex_str: &str) -> Digest {
-    (&checksummed_hex::decode(hex_str).unwrap()[..]) //? Safe to unwrap?
+    (&checksummed_hex::decode(hex_str).unwrap()[..])
         .try_into()
-        .unwrap() //? Safe to unwrap?
+        .unwrap()
 }
 
 /// Prints a global state update entry in a format ready for inclusion in a TOML file.

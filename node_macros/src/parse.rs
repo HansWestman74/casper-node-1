@@ -117,11 +117,11 @@ impl ReactorDefinition {
     pub(crate) fn inject_control_announcements(&mut self) {
         // For now, we allow no manual control announcements implementation.
         let ty: Type = syn::parse_str("crate::effect::announcements::ControlAnnouncement")
-            .expect("Hardcoded ControlAnnouncement type could not be parsed");
+            .expect("Hardcoded ControlAnnouncement type could not be parsed"); //?expect
         self.announcements.push(AnnouncementDefinition {
             announcement_type: ty
                 .try_into()
-                .expect("could not convert hardcoded `ControlAnnouncement` to `RustType`"),
+                .expect("could not convert hardcoded `ControlAnnouncement` to `RustType`"),//?expect
             targets: vec![Target::Panic],
         })
     }

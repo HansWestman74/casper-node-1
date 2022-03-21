@@ -1979,7 +1979,7 @@ impl Config {
     /// alive for the duration of the test since its destructor removes the dir from the filesystem.
     #[cfg(test)]
     pub(crate) fn default_for_tests() -> (Self, TempDir) {
-        let tempdir = tempfile::tempdir().expect("should get tempdir");
+        let tempdir = tempfile::tempdir().expect("should get tempdir"); //?expect
         let path = tempdir.path().join("lmdb");
 
         let config = Config {
@@ -2003,9 +2003,9 @@ impl Storage {
         let mut txn = self
             .env
             .begin_ro_txn()
-            .expect("could not create RO transaction");
+            .expect("could not create RO transaction"); //?expect
         txn.get_value(self.deploy_db, &deploy_hash)
-            .expect("could not retrieve value from storage")
+            .expect("could not retrieve value from storage") //?expect
     }
 
     /// Reads all known deploy hashes from the internal store.
@@ -2017,16 +2017,16 @@ impl Storage {
         let txn = self
             .env
             .begin_ro_txn()
-            .expect("could not create RO transaction");
+            .expect("could not create RO transaction"); //?expect
 
         let mut cursor = txn
             .open_ro_cursor(self.deploy_db)
-            .expect("could not create cursor");
+            .expect("could not create cursor"); //?expect
 
         cursor
             .iter()
             .map(|(raw_key, _)| {
-                DeployHash::new(Digest::try_from(raw_key).expect("malformed deploy hash in DB"))
+                DeployHash::new(Digest::try_from(raw_key).expect("malformed deploy hash in DB")) //?expect
             })
             .collect()
     }
@@ -2059,16 +2059,16 @@ impl Storage {
         let mut read_only_lmdb_transaction = self
             .env
             .begin_ro_txn()
-            .expect("Could not start read only transaction for lmdb");
+            .expect("Could not start read only transaction for lmdb"); //?expect
         let switch_block = self
             .get_switch_block_by_era_id(
                 &mut read_only_lmdb_transaction,
                 EraId::from(switch_block_era_num),
             )
-            .expect("LMDB panicked trying to get switch block");
+            .expect("LMDB panicked trying to get switch block"); //?expect
         read_only_lmdb_transaction
             .commit()
-            .expect("Could not commit transaction");
+            .expect("Could not commit transaction"); //?expect
         switch_block
     }
 }

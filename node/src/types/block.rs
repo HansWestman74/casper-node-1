@@ -153,7 +153,7 @@ static BLOCK: Lazy<Block> = Lazy::new(|| {
         protocol_version,
         verifiable_chunked_hash_activation,
     )
-    .expect("could not construct block")
+    .expect("could not construct block") //?expect
 });
 static JSON_BLOCK: Lazy<JsonBlock> = Lazy::new(|| {
     let block = Block::doc_example().clone();
@@ -629,8 +629,8 @@ impl EraEnd {
             .sorted_by_key(|(_, weight)| Reverse(**weight))
             .map(|(validator_id, weight)| {
                 let validator_hash =
-                    Digest::hash(validator_id.to_bytes().expect("Could not hash validator"));
-                let weight_hash = Digest::hash(weight.to_bytes().expect("Could not hash weight"));
+                    Digest::hash(validator_id.to_bytes().expect("Could not hash validator")); //?expect
+                let weight_hash = Digest::hash(weight.to_bytes().expect("Could not hash weight")); //?expect
                 Digest::hash_pair(&validator_hash, &weight_hash)
             });
         let hashed_next_era_validator_weights =
@@ -801,7 +801,7 @@ impl BlockHeader {
 
     fn hash_v1(&self) -> BlockHash {
         let serialized_header = Self::serialize(self)
-            .unwrap_or_else(|error| panic!("should serialize block header: {}", error));
+            .unwrap_or_else(|error| panic!("should serialize block header: {}", error)); //?panic
         BlockHash::new(Digest::hash(&serialized_header))
     }
 
@@ -825,19 +825,19 @@ impl BlockHeader {
             Some(era_end) => era_end.hash(),
         };
 
-        let hashed_era_id = Digest::hash(era_id.to_bytes().expect("Could not serialize era_id"));
-        let hashed_height = Digest::hash(height.to_bytes().expect("Could not serialize height"));
+        let hashed_era_id = Digest::hash(era_id.to_bytes().expect("Could not serialize era_id")); //?expect
+        let hashed_height = Digest::hash(height.to_bytes().expect("Could not serialize height")); //?expect
         let hashed_timestamp =
-            Digest::hash(timestamp.to_bytes().expect("Could not serialize timestamp"));
+            Digest::hash(timestamp.to_bytes().expect("Could not serialize timestamp")); //?expect
         let hashed_protocol_version = Digest::hash(
             protocol_version
                 .to_bytes()
-                .expect("Could not serialize protocol version"),
+                .expect("Could not serialize protocol version"), //?expect
         );
         let hashed_random_bit = Digest::hash(
             random_bit
                 .to_bytes()
-                .expect("Could not serialize protocol version"),
+                .expect("Could not serialize protocol version"), //?expect
         );
 
         Digest::hash_slice_rfold(&[
@@ -1156,7 +1156,7 @@ impl BlockBody {
     fn hash_v1(&self) -> Digest {
         let serialized_body = self
             .to_bytes()
-            .unwrap_or_else(|error| panic!("should serialize block body: {}", error));
+            .unwrap_or_else(|error| panic!("should serialize block body: {}", error)); //?panic
         Digest::hash(&serialized_body)
     }
 
@@ -1171,7 +1171,7 @@ impl BlockBody {
 
         let proposer = MerkleBlockBodyPart::new(
             proposer,
-            Digest::hash(&proposer.to_bytes().expect("Could not serialize proposer")),
+            Digest::hash(&proposer.to_bytes().expect("Could not serialize proposer")), //?expect
             Digest::SENTINEL_RFOLD,
         );
 
@@ -1599,7 +1599,7 @@ impl Block {
             protocol_version,
             verifiable_chunked_hash_activation,
         )
-        .expect("Could not create random block with specifics")
+        .expect("Could not create random block with specifics") //?expect
     }
 }
 

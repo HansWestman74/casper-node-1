@@ -7,16 +7,16 @@ use crate::dependent_file::DependentFile;
 
 pub static MANIFEST_NAME_REGEX: Lazy<Regex> =
     // NOTE: Safe to unwrap since string literal is correct
-    Lazy::new(|| Regex::new(r#"(?m)(^name = )"([^"]+)"#).unwrap());
+    Lazy::new(|| Regex::new(r#"(?m)(^name = )"([^"]+)"#).unwrap()); //?unwrap
 pub static MANIFEST_VERSION_REGEX: Lazy<Regex> =
     // NOTE: Safe to unwrap since string literal is correct
-    Lazy::new(|| Regex::new(r#"(?m)(^version = )"([^"]+)"#).unwrap());
+    Lazy::new(|| Regex::new(r#"(?m)(^version = )"([^"]+)"#).unwrap()); //?unwrap
 pub static PACKAGE_JSON_NAME_REGEX: Lazy<Regex> =
     // NOTE: Safe to unwrap since string literal is correct
-    Lazy::new(|| Regex::new(r#"(?m)(^  "name": )"([^"]+)"#).unwrap());
+    Lazy::new(|| Regex::new(r#"(?m)(^  "name": )"([^"]+)"#).unwrap()); //?unwrap
 pub static PACKAGE_JSON_VERSION_REGEX: Lazy<Regex> =
     // NOTE: Safe to unwrap since string literal is correct
-    Lazy::new(|| Regex::new(r#"(?m)(^  "version": )"([^"]+)"#).unwrap());
+    Lazy::new(|| Regex::new(r#"(?m)(^  "version": )"([^"]+)"#).unwrap()); //?unwrap
 
 fn replacement(updated_version: &str) -> String {
     format!(r#"$1"{}"#, updated_version)
@@ -34,25 +34,25 @@ pub mod types {
             DependentFile::new(
                 "execution_engine/Cargo.toml",
                 // NOTE: Safe to unwrap since string literal is correct
-                Regex::new(r#"(?m)(^casper-types = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),
+                Regex::new(r#"(?m)(^casper-types = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),//?unwrap
                 replacement,
             ),
             DependentFile::new(
                 "execution_engine_testing/test_support/Cargo.toml",
                 // NOTE: Safe to unwrap since string literal is correct
-                Regex::new(r#"(?m)(^casper-types = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),
+                Regex::new(r#"(?m)(^casper-types = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),//?unwrap
                 replacement,
             ),
             DependentFile::new(
                 "node/Cargo.toml",
                 // NOTE: Safe to unwrap since string literal is correct
-                Regex::new(r#"(?m)(^casper-types = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),
+                Regex::new(r#"(?m)(^casper-types = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),//?unwrap
                 replacement,
             ),
             DependentFile::new(
                 "smart_contracts/contract/Cargo.toml",
                 // NOTE: Safe to unwrap since string literal is correct
-                Regex::new(r#"(?m)(^casper-types = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),
+                Regex::new(r#"(?m)(^casper-types = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),//?unwrap
                 replacement,
             ),
             DependentFile::new(
@@ -66,7 +66,7 @@ pub mod types {
                 Regex::new(
                     r#"(?m)(#!\[doc\(html_root_url = "https://docs.rs/casper-types)/(?:[^"]+)"#,
                 )
-                .unwrap(),
+                .unwrap(), //?unwrap
                 replacement_with_slash,
             ),
         ]
@@ -81,19 +81,19 @@ pub mod hashing {
             DependentFile::new(
                 "execution_engine/Cargo.toml",
                 // NOTE: Safe to unwrap since string literal is correct
-                Regex::new(r#"(?m)(^casper-hashing = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),
+                Regex::new(r#"(?m)(^casper-hashing = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),//?unwrap
                 replacement,
             ),
             DependentFile::new(
                 "execution_engine_testing/test_support/Cargo.toml",
                 // NOTE: Safe to unwrap since string literal is correct
-                Regex::new(r#"(?m)(^casper-hashing = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),
+                Regex::new(r#"(?m)(^casper-hashing = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),//?unwrap
                 replacement,
             ),
             DependentFile::new(
                 "node/Cargo.toml",
                 // NOTE: Safe to unwrap since string literal is correct
-                Regex::new(r#"(?m)(^casper-hashing = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),
+                Regex::new(r#"(?m)(^casper-hashing = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),//?unwrap
                 replacement,
             ),
             DependentFile::new(
@@ -107,7 +107,7 @@ pub mod hashing {
                 Regex::new(
                     r#"(?m)(#!\[doc\(html_root_url = "https://docs.rs/casper-hashing)/(?:[^"]+)"#,
                 )
-                .unwrap(),
+                .unwrap(), //?unwrap
                 replacement_with_slash,
             ),
         ]
@@ -123,14 +123,14 @@ pub mod execution_engine {
                     "execution_engine_testing/test_support/Cargo.toml",
                     // NOTE: Safe to unwrap since string literal is correct
                     Regex::new(r#"(?m)(^casper-execution-engine = \{[^\}]*version = )"(?:[^"]+)"#)
-                        .unwrap(), 
+                        .unwrap(), //?unwrap
                     replacement,
                 ),
                 DependentFile::new(
                     "node/Cargo.toml",
                     // NOTE: Safe to unwrap since string literal is correct
                     Regex::new(r#"(?m)(^casper-execution-engine = \{[^\}]*version = )"(?:[^"]+)"#)
-                        .unwrap(),
+                        .unwrap(),//?unwrap
                     replacement,
                 ),
                 DependentFile::new(
@@ -141,7 +141,7 @@ pub mod execution_engine {
                 DependentFile::new(
                     "execution_engine/src/lib.rs",
                     // NOTE: Safe to unwrap since string literal is correct
-                    Regex::new(r#"(?m)(#!\[doc\(html_root_url = "https://docs.rs/casper-execution-engine)/(?:[^"]+)"#).unwrap(),
+                    Regex::new(r#"(?m)(#!\[doc\(html_root_url = "https://docs.rs/casper-execution-engine)/(?:[^"]+)"#).unwrap(),//?unwrap
                     replacement_with_slash,
                 ),
             ]
@@ -156,7 +156,7 @@ pub mod node_macros {
                 DependentFile::new(
                     "node/Cargo.toml",
                      // NOTE: Safe to unwrap since string literal is correct
-                    Regex::new(r#"(?m)(^casper-node-macros = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),
+                    Regex::new(r#"(?m)(^casper-node-macros = \{[^\}]*version = )"(?:[^"]+)"#).unwrap(),//?unwrap
                     replacement,
                 ),
                 DependentFile::new(
@@ -170,7 +170,7 @@ pub mod node_macros {
                     Regex::new(
                         r#"(?m)(#!\[doc\(html_root_url = "https://docs.rs/casper-node-macros)/(?:[^"]+)"#,
                     )
-                    .unwrap(),
+                    .unwrap(),//?unwrap
                     replacement_with_slash,
                 ),
             ]
@@ -193,7 +193,7 @@ pub mod node {
                 Regex::new(
                     r#"(?m)(#!\[doc\(html_root_url = "https://docs.rs/casper-node)/(?:[^"]+)"#,
                 )
-                .unwrap(),
+                .unwrap(), //?unwrap
                 replacement_with_slash,
             ),
         ]
@@ -216,7 +216,7 @@ pub mod smart_contracts_contract {
                 Regex::new(
                     r#"(?m)(#!\[doc\(html_root_url = "https://docs.rs/casper-contract)/(?:[^"]+)"#,
                 )
-                .unwrap(),
+                .unwrap(), //?unwrap
                 replacement_with_slash,
             ),
         ]
@@ -266,7 +266,7 @@ pub mod chainspec_protocol_version {
 
     pub static REGEX: Lazy<Regex> =
         // NOTE: Safe to unwrap since string literal is correct
-        Lazy::new(|| Regex::new(r#"(?m)(^version = )'([^']+)"#).unwrap());
+        Lazy::new(|| Regex::new(r#"(?m)(^version = )'([^']+)"#).unwrap()); //?unwrap
 
     pub static DEPENDENT_FILES: Lazy<Vec<DependentFile>> = Lazy::new(|| {
         vec![
@@ -278,7 +278,7 @@ pub mod chainspec_protocol_version {
             DependentFile::new(
                 "node/src/components/rpc_server/rpcs/docs.rs",
                  // NOTE: Safe to unwrap since string literal is correct
-                Regex::new(r#"(?m)(DOCS_EXAMPLE_PROTOCOL_VERSION: ProtocolVersion =\s*ProtocolVersion::from_parts)\((\d+,\s*\d+,\s*\d+)\)"#).unwrap(),
+                Regex::new(r#"(?m)(DOCS_EXAMPLE_PROTOCOL_VERSION: ProtocolVersion =\s*ProtocolVersion::from_parts)\((\d+,\s*\d+,\s*\d+)\)"#).unwrap(),//?unwrap
                 rpcs_docs_rs_replacement,
             ),
         ]
@@ -298,7 +298,7 @@ pub mod chainspec_activation_point {
 
     pub static REGEX: Lazy<Regex> =
         // NOTE: Safe to unwrap since string literal is correct
-        Lazy::new(|| Regex::new(r#"(?m)(^activation_point =) (.+)"#).unwrap());
+        Lazy::new(|| Regex::new(r#"(?m)(^activation_point =) (.+)"#).unwrap()); //?unwrap
 
     pub static DEPENDENT_FILES: Lazy<Vec<DependentFile>> = Lazy::new(|| {
         vec![DependentFile::new(

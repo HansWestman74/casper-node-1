@@ -192,13 +192,13 @@ fn get_args() -> Args {
         .get_matches();
 
     let root_dir = match arg_matches.value_of(ROOT_DIR_ARG_NAME) {
-        Some(path) => PathBuf::from_str(path).expect("should be a valid unicode path"),
+        Some(path) => PathBuf::from_str(path).expect("should be a valid unicode path"), //?expect
         None => env::current_dir()
-            .expect("should be able to access current working dir")
+            .expect("should be able to access current working dir") //?expect
             .parent()
-            .expect("current working dir should have parent")
+            .expect("current working dir should have parent") //?expect
             .parent()
-            .expect("current working dir should have two parents")
+            .expect("current working dir should have two parents") //?expect
             .to_path_buf(),
     };
 
@@ -215,7 +215,7 @@ fn get_args() -> Args {
         .value_of(ACTIVATION_POINT_ARG_NAME)
         .map(|value| {
             // Safe to unwrap, as the arg is validated as being able to be parsed as a `u64`.
-            value.parse().unwrap()
+            value.parse().unwrap() //?unwrap
         });
 
     let dry_run = arg_matches.is_present(DRY_RUN_ARG_NAME);
@@ -278,9 +278,9 @@ fn main() {
             .arg("--offline")
             .current_dir(root_dir())
             .status()
-            .expect("Failed to execute 'cargo generate-lockfile'");
+            .expect("Failed to execute 'cargo generate-lockfile'"); //?expect
 
-        //? Change assert-->debug_assert+error! ?
+        //?assert
         assert!(status.success(), "Failed to update Cargo.lock");
     }
 }

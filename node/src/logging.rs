@@ -190,7 +190,7 @@ where
             let ext = span.extensions();
             let fields = &ext
                 .get::<FormattedFields<N>>()
-                .expect("Unable to find FormattedFields in extensions; this is a bug");
+                .expect("Unable to find FormattedFields in extensions; this is a bug"); //?expect
             if !fields.is_empty() {
                 write!(writer, "{{{}}}", fields)?;
             }
@@ -217,7 +217,7 @@ where
                 // Abbreviate all but last segment.
                 if count > 1 {
                     for part in parts.iter_mut().take(count - 1) {
-                        //? Change assert-->debug_assert+error! ?
+                        //?assert
                         assert!(part.is_ascii(), "part should be ascii");
                         *part = &part[0..1];
                     }

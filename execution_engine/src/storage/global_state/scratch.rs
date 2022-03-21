@@ -99,7 +99,7 @@ impl ScratchGlobalState {
             &mut *self
                 .cache
                 .write()
-                .expect("Cache lock should not be poisoned"),
+                .expect("Cache lock should not be poisoned"), //?expect
             Cache::new(),
         );
         cache.into_inner()
@@ -117,7 +117,7 @@ impl StateReader<Key, StoredValue> for ScratchGlobalStateView {
         if let Some(value) = self
             .cache
             .read()
-            .expect("Cache lock should not be poisoned")
+            .expect("Cache lock should not be poisoned") //?expect
             .get(key)
         {
             return Ok(Some(value.clone()));
@@ -133,12 +133,12 @@ impl StateReader<Key, StoredValue> for ScratchGlobalStateView {
             ReadResult::Found(value) => {
                 self.cache
                     .write()
-                    .expect("Cache lock should not be poisoned")
+                    .expect("Cache lock should not be poisoned") //?expect
                     .insert(*key, value.clone());
                 Some(value)
             }
             ReadResult::NotFound => None,
-            ReadResult::RootNotFound => panic!("ScratchGlobalState has invalid root"),
+            ReadResult::RootNotFound => panic!("ScratchGlobalState has invalid root"), //?panic
         };
         txn.commit()?;
         Ok(ret)
@@ -165,7 +165,7 @@ impl StateReader<Key, StoredValue> for ScratchGlobalStateView {
         )? {
             ReadResult::Found(value) => Some(value),
             ReadResult::NotFound => None,
-            ReadResult::RootNotFound => panic!("LmdbWithCacheGlobalState has invalid root"),
+            ReadResult::RootNotFound => panic!("LmdbWithCacheGlobalState has invalid root"), //?panic
         };
         txn.commit()?;
         Ok(ret)
@@ -209,7 +209,7 @@ impl CommitProvider for ScratchGlobalState {
             let cached_value = self
                 .cache
                 .read()
-                .expect("Cache lock should not be poisoned")
+                .expect("Cache lock should not be poisoned") //?expect
                 .get(&key)
                 .cloned();
             let value = match (cached_value, transform) {
@@ -267,7 +267,7 @@ impl CommitProvider for ScratchGlobalState {
 
             self.cache
                 .write()
-                .expect("Cache lock should not be poisoned")
+                .expect("Cache lock should not be poisoned") //?expect
                 .insert(key, value);
         }
         Ok(state_hash)

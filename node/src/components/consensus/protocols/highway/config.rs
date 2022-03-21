@@ -39,11 +39,11 @@ impl Default for Config {
     fn default() -> Self {
         // NOTE: All unwraps safe as string literal is correct.
         Config {
-            pending_vertex_timeout: "10sec".parse().unwrap(),
+            pending_vertex_timeout: "10sec".parse().unwrap(), //?unwrap
             standstill_timeout: None,
-            request_state_interval: Some("10sec".parse().unwrap()),
-            log_participation_interval: Some("10sec".parse().unwrap()),
-            log_synchronizer_interval: Some("5sec".parse().unwrap()),
+            request_state_interval: Some("10sec".parse().unwrap()), //?unwrap
+            log_participation_interval: Some("10sec".parse().unwrap()), //?unwrap
+            log_synchronizer_interval: Some("5sec".parse().unwrap()), //?unwrap
             log_unit_sizes: false,
             max_execution_delay: 3,
             max_requests_for_vertex: 5,

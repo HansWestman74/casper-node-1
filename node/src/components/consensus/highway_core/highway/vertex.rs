@@ -280,7 +280,7 @@ impl<C: Context> WireUnit<C> {
     /// Returns the unit's hash, which is used as a unit identifier.
     fn compute_hash(&self) -> C::Hash {
         // TODO: Use serialize_into to avoid allocation?
-        <C as Context>::hash(&bincode::serialize(self).expect("serialize WireUnit"))
+        <C as Context>::hash(&bincode::serialize(self).expect("serialize WireUnit")) //?expect
     }
 }
 
@@ -387,7 +387,7 @@ impl<C: Context> Ping<C> {
 
     /// Computes the hash of a ping, i.e. of the creator and timestamp.
     fn hash(creator: ValidatorIndex, timestamp: Timestamp, instance_id: C::InstanceId) -> C::Hash {
-        let bytes = bincode::serialize(&(creator, timestamp, instance_id)).expect("serialize Ping");
+        let bytes = bincode::serialize(&(creator, timestamp, instance_id)).expect("serialize Ping"); //?expect
         <C as Context>::hash(&bytes)
     }
 }

@@ -23,7 +23,7 @@ pub static ALICE_PUBLIC_KEY: Lazy<PublicKey> = Lazy::new(|| PublicKey::from(&**A
 pub static ALICE_NODE_ID: Lazy<NodeId> = Lazy::new(|| {
     NodeId::from(KeyFingerprint::from(Sha512::new(match *ALICE_PUBLIC_KEY {
         PublicKey::Ed25519(pub_key) => pub_key,
-        _ => panic!("ALICE_PUBLIC_KEY is Ed25519"),
+        _ => panic!("ALICE_PUBLIC_KEY is Ed25519"), //?panic
     })))
 });
 

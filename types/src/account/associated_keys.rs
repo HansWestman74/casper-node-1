@@ -171,7 +171,7 @@ pub mod gens {
         proptest::collection::btree_map(account_hash_arb(), weight_arb(), 10).prop_map(|keys| {
             let mut associated_keys = AssociatedKeys::default();
             keys.into_iter().for_each(|(k, v)| {
-                associated_keys.add_key(k, v).unwrap();
+                associated_keys.add_key(k, v).unwrap(); //?unwrap
             });
             associated_keys
         })

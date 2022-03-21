@@ -31,7 +31,7 @@ where
         index: usize,
         args: RuntimeArgs,
     ) -> Result<Option<RuntimeValue>, Trap> {
-        let func = FunctionIndex::try_from(index).expect("unknown function index");
+        let func = FunctionIndex::try_from(index).expect("unknown function index"); //?expect
 
         let host_function_costs = self.config.wasm_config().take_host_function_costs();
 

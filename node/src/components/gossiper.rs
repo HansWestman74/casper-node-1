@@ -80,7 +80,7 @@ pub(crate) fn get_deploy_from_storage<T: Item + 'static, REv: ReactorEventT<T>>(
                 results
                     .pop()
                     // NOTE: Safe to unwrap as results have length 1
-                    .unwrap()
+                    .unwrap() //?unwrap
                     .ok_or_else(|| String::from("failed to get deploy from storage"))
             } else {
                 Err(String::from("expected a single result"))
@@ -132,6 +132,7 @@ impl<T: Item + 'static, REv: ReactorEventT<T>> Gossiper<T, REv> {
             + 'static,
         registry: &Registry,
     ) -> Result<Self, prometheus::Error> {
+        //?assert
         assert!(
             !T::ID_IS_COMPLETE_ITEM,
             "this should only be called for types where T::ID_IS_COMPLETE_ITEM is false"
@@ -164,7 +165,7 @@ impl<T: Item + 'static, REv: ReactorEventT<T>> Gossiper<T, REv> {
             gossip_timeout: config.gossip_request_timeout().into(),
             get_from_peer_timeout: config.get_remainder_timeout().into(),
             get_from_holder: Box::new(|_, item, _| {
-                panic!("gossiper should never try to get {}", item)
+                panic!("gossiper should never try to get {}", item) //?panic
             }),
             metrics: Metrics::new(name, registry)?,
         })

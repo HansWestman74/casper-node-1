@@ -23,7 +23,7 @@ impl Default for Config {
     fn default() -> Self {
         Config {
             // NOTE: Safe to unwrap since string const is correct
-            get_from_peer_timeout: TimeDiff::from_str(DEFAULT_GET_FROM_PEER_TIMEOUT).unwrap(),
+            get_from_peer_timeout: TimeDiff::from_str(DEFAULT_GET_FROM_PEER_TIMEOUT).unwrap(),//?unwrap
         }
     }
 }

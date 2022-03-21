@@ -264,7 +264,7 @@ impl FromBytes for CLType {
                 let (mut inner_types, remainder) = parse_cl_tuple_types(1, remainder)?;
                 // NOTE: Safe to unwrap as `parse_cl_tuple_types` is expected to have exactly 1
                 // elements
-                let cl_type = CLType::Tuple1([inner_types.pop_front().unwrap()]);
+                let cl_type = CLType::Tuple1([inner_types.pop_front().unwrap()]); //?unwrap
                 Ok((cl_type, remainder))
             }
             CL_TYPE_TAG_TUPLE2 => {
@@ -272,8 +272,8 @@ impl FromBytes for CLType {
                 // NOTE: Safe to unwrap as `parse_cl_tuple_types` is expected to have exactly 2
                 // elements
                 let cl_type = CLType::Tuple2([
-                    inner_types.pop_front().unwrap(),
-                    inner_types.pop_front().unwrap(),
+                    inner_types.pop_front().unwrap(), //?unwrap
+                    inner_types.pop_front().unwrap(), //?unwrap
                 ]);
                 Ok((cl_type, remainder))
             }
@@ -282,9 +282,9 @@ impl FromBytes for CLType {
                 // NOTE: Safe to unwrap as `parse_cl_tuple_types` is expected to have exactly 3
                 // elements
                 let cl_type = CLType::Tuple3([
-                    inner_types.pop_front().unwrap(),
-                    inner_types.pop_front().unwrap(),
-                    inner_types.pop_front().unwrap(),
+                    inner_types.pop_front().unwrap(), //?unwrap
+                    inner_types.pop_front().unwrap(), //?unwrap
+                    inner_types.pop_front().unwrap(), //?unwrap
                 ]);
                 Ok((cl_type, remainder))
             }

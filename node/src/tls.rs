@@ -126,7 +126,7 @@ impl Sha512 {
     fn create_message_digest() -> MessageDigest {
         // This can only fail if we specify a `Nid` that does not exist, which cannot happen unless
         // there is something wrong with `Self::NID`.
-        MessageDigest::from_nid(Self::NID).expect("Sha512::NID is invalid")
+        MessageDigest::from_nid(Self::NID).expect("Sha512::NID is invalid") //?expect
     }
 }
 
@@ -507,7 +507,7 @@ pub(crate) fn validate_cert(cert: X509) -> Result<TlsCert, ValidationError> {
     }
 
     // We now have a valid certificate and can extract the fingerprint.
-    //? Change assert-->debug_assert+error! ?
+    //?assert_eq
     assert_eq!(
         Sha512::NID,
         SIGNATURE_DIGEST,
@@ -526,7 +526,7 @@ pub(crate) fn validate_cert(cert: X509) -> Result<TlsCert, ValidationError> {
         .public_key()
         .to_bytes(
             ec::EcGroup::from_curve_name(SIGNATURE_CURVE)
-                .expect("broken constant SIGNATURE_CURVE")
+                .expect("broken constant SIGNATURE_CURVE") //?expect
                 .as_ref(),
             ec::PointConversionForm::COMPRESSED,
             &mut big_num_context,
@@ -565,12 +565,12 @@ fn now() -> i64 {
     let ts: i64 = now
         .duration_since(UNIX_EPOCH)
         // This should work unless the clock is set to before 1970.
-        .expect("Great Scott! Your clock is horribly broken, Marty.")
+        .expect("Great Scott! Your clock is horribly broken, Marty.") //?expect
         .as_secs()
         // This will fail past year 2038 on 32 bit systems and very far into the future, both cases
         // we consider out of scope.
         .try_into()
-        .expect("32-bit systems and far future are not supported");
+        .expect("32-bit systems and far future are not supported"); //?expect
 
     ts
 }
@@ -671,7 +671,7 @@ fn generate_cert(private_key: &PKey<Private>, cn: &str) -> SslResult<X509> {
 
     // Set the public key and sign.
     builder.set_pubkey(private_key.as_ref())?;
-    //? Change assert-->debug_assert+error! ?
+    //?assert_eq
     assert_eq!(
         Sha512::NID,
         SIGNATURE_DIGEST,
@@ -682,7 +682,7 @@ fn generate_cert(private_key: &PKey<Private>, cn: &str) -> SslResult<X509> {
     let cert = builder.build();
 
     // Cheap sanity check.
-    //? Change assert-->debug_assert+error! ?
+    //?assert
     assert!(
         validate_cert(cert.clone()).is_ok(),
         "newly generated cert does not pass our own validity check"

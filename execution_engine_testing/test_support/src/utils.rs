@@ -30,8 +30,9 @@ static RUST_WORKSPACE_PATH: Lazy<PathBuf> = Lazy::new(|| {
     let path = Path::new(env!("CARGO_MANIFEST_DIR"))
         .parent()
         .and_then(Path::parent)
-        .expect("CARGO_MANIFEST_DIR should have parent");
-    //? Change assert-->debug_assert+error! ?
+        .expect("CARGO_MANIFEST_DIR should have parent"); //?expect
+
+    //?assert
     assert!(
         path.exists(),
         "Workspace path {} does not exists",
@@ -46,7 +47,8 @@ static RUST_WORKSPACE_WASM_PATH: Lazy<PathBuf> = Lazy::new(|| {
         .join("target")
         .join("wasm32-unknown-unknown")
         .join("release");
-    //? Change assert-->debug_assert+error! ?
+
+    //?assert
     assert!(
         path.exists() || RUST_TOOL_WASM_PATH.exists(),
         "Rust Wasm path {} does not exists",
@@ -58,7 +60,7 @@ static RUST_WORKSPACE_WASM_PATH: Lazy<PathBuf> = Lazy::new(|| {
 // cargo-casper tool, i.e. 'wasm/'.
 static RUST_TOOL_WASM_PATH: Lazy<PathBuf> = Lazy::new(|| {
     env::current_dir()
-        .expect("should get current working dir")
+        .expect("should get current working dir") //?expect
         .join("wasm")
 });
 // The location of compiled Wasm files if compiled from the Rust sources within the casper-node
@@ -77,7 +79,7 @@ static MAYBE_CARGO_TARGET_DIR_WASM_PATH: Lazy<Option<PathBuf>> = Lazy::new(|| {
 #[cfg(feature = "use-as-wasm")]
 static ASSEMBLY_SCRIPT_WORKSPACE_WASM_PATH: Lazy<PathBuf> = Lazy::new(|| {
     let path = RUST_WORKSPACE_PATH.join("target_as");
-    //? Change assert-->debug_assert+error! ?
+    //?assert
     assert!(
         path.exists(),
         "AssemblyScript WASM path {} does not exist.",
@@ -190,7 +192,7 @@ pub fn get_exec_costs<T: AsRef<ExecutionResult>, I: IntoIterator<Item = T>>(
 /// # Panics
 /// Panics if `response` is `None`.
 pub fn get_success_result(response: &[Rc<ExecutionResult>]) -> &ExecutionResult {
-    &*response.get(0).expect("should have a result")
+    &*response.get(0).expect("should have a result") //?expect
 }
 
 /// Returns an error if the `ExecutionResult` has an error.
@@ -199,13 +201,14 @@ pub fn get_success_result(response: &[Rc<ExecutionResult>]) -> &ExecutionResult 
 /// Panics if the result does not have a precondition failure.
 /// Panics if result.as_error() is `None`.
 pub fn get_precondition_failure(response: &[Rc<ExecutionResult>]) -> &Error {
-    let result = response.get(0).expect("should have a result");
-    //? Change assert-->debug_assert+error! ?
+    let result = response.get(0).expect("should have a result"); //?expect
+
+    //?assert
     assert!(
         result.has_precondition_failure(),
         "should be a precondition failure"
     );
-    result.as_error().expect("should have an error")
+    result.as_error().expect("should have an error") //?expect
 }
 
 /// Returns a `String` concatenated from all of the error messages from the `ExecutionResult`.

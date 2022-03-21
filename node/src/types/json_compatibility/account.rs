@@ -17,10 +17,10 @@ static ACCOUNT: Lazy<Account> = Lazy::new(|| {
     let main_purse = URef::from_formatted_str(
         "uref-09480c3248ef76b603d386f3f4f8a5f87f597d4eaffd475433f861af187ab5db-007",
     )
-    .unwrap();
+    .unwrap(); //?unwrap
 
     // NOTE safe to unwrap since byte length is correct
-    let secret_key = SecretKey::ed25519_from_bytes([0; 32]).unwrap();
+    let secret_key = SecretKey::ed25519_from_bytes([0; 32]).unwrap(); //?unwrap
     let account_hash = PublicKey::from(&secret_key).to_account_hash();
     let associated_key = AssociatedKey {
         account_hash,

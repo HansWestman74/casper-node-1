@@ -82,7 +82,7 @@ impl<'a, C: Context> Horizon<'a, C> {
         let mut pruned = BTreeSet::new();
         loop {
             let sees_quorum = |idx: &ValidatorIndex| {
-                self.seen_weight(self.state.unit(self.latest[*idx].unwrap()), &committee) >= quorum
+                self.seen_weight(self.state.unit(self.latest[*idx].unwrap()), &committee) >= quorum //?unwrap
             };
             let (new_committee, new_pruned): (Vec<_>, Vec<_>) =
                 committee.iter().cloned().partition(sees_quorum);
@@ -101,7 +101,7 @@ impl<'a, C: Context> Horizon<'a, C> {
     /// committee was computed from a `Horizon` that originated from the same `level0` as this one.
     pub(super) fn committee_quorum(&self, committee: &[ValidatorIndex]) -> Option<Weight> {
         let seen_weight = |idx: &ValidatorIndex| {
-            self.seen_weight(self.state.unit(self.latest[*idx].unwrap()), committee)
+            self.seen_weight(self.state.unit(self.latest[*idx].unwrap()), committee) //?unwrap
         };
         committee.iter().map(seen_weight).min()
     }

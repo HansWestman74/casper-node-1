@@ -307,7 +307,7 @@ impl ItemFetcher<Deploy> for Fetcher<Deploy> {
             .event(move |mut results| Event::GetFromStorageResult {
                 id,
                 peer,
-                maybe_item: Box::new(results.pop().expect("can only contain one result")),
+                maybe_item: Box::new(results.pop().expect("can only contain one result")), //?expect
             })
     }
 }

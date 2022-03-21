@@ -153,7 +153,7 @@ async fn main() -> Result<(), anyhow::Error> {
 
         let header = block_and_execution_effects.block.take_header();
         let expected = block.take_header();
-        //? Change assert-->debug_assert+error! ?
+
         assert_eq!(
             header.state_root_hash(),
             expected.state_root_hash(),

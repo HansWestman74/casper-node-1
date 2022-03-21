@@ -93,6 +93,7 @@ impl Package {
             .find(|&file| file.path() == manifest_path)
             .unwrap_or_else(|| {
                 panic!(
+                    //?panic
                     "{} should be a dependent file of {}",
                     manifest_path.display(),
                     relative_path.as_ref().display()
@@ -104,6 +105,7 @@ impl Package {
                 .captures(manifest.contents())
                 .unwrap_or_else(|| {
                     panic!(
+                        //?panic
                         "should find package name and version in {}",
                         manifest_path.display()
                     )
@@ -111,6 +113,7 @@ impl Package {
                 .get(CAPTURE_INDEX)
                 .unwrap_or_else(|| {
                     panic!(
+                        //?panic
                         "package name and version should be regex capture at index {} in {}",
                         CAPTURE_INDEX,
                         manifest_path.display()
@@ -122,7 +125,7 @@ impl Package {
 
         let name = find_value(T::name_regex());
         let version = find_value(T::version_regex());
-        let current_version = SemVer::try_from(&*version).expect("should parse current version");
+        let current_version = SemVer::try_from(&*version).expect("should parse current version"); //?expect
 
         Package {
             name,
@@ -174,7 +177,7 @@ pub fn get_updated_version_from_user(name: &str, current_version: SemVer) -> Opt
             "Current {} version is {}.  Enter new version (leave blank for unchanged): ",
             name, current_version
         );
-        io::stdout().flush().expect("should flush stdout");
+        io::stdout().flush().expect("should flush stdout"); //?expect
         let mut input = String::new();
         match io::stdin().read_line(&mut input) {
             Ok(_) => {

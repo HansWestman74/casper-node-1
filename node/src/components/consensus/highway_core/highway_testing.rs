@@ -233,7 +233,7 @@ impl HighwayValidator {
                     }
                     HighwayMessage::Timer(_) | HighwayMessage::RequestBlock(_) => vec![msg],
                     HighwayMessage::WeAreFaulty(ev) => {
-                        panic!("validator equivocated unexpectedly: {:?}", ev);
+                        panic!("validator equivocated unexpectedly: {:?}", ev); //?panic
                     }
                 }
             }
@@ -246,7 +246,7 @@ impl HighwayValidator {
                     }
                     HighwayMessage::Timer(_) | HighwayMessage::RequestBlock(_) => vec![msg],
                     HighwayMessage::WeAreFaulty(ev) => {
-                        panic!("validator equivocated unexpectedly: {:?}", ev);
+                        panic!("validator equivocated unexpectedly: {:?}", ev); //?panic
                     }
                 }
             }
@@ -257,7 +257,7 @@ impl HighwayValidator {
                     | HighwayMessage::Timer(_)
                     | HighwayMessage::RequestBlock(_) => vec![msg],
                     HighwayMessage::WeAreFaulty(ev) => {
-                        panic!("validator equivocated unexpectedly: {:?}", ev);
+                        panic!("validator equivocated unexpectedly: {:?}", ev); //?panic
                     }
                 }
             }
@@ -491,7 +491,7 @@ where
             .validator_mut()
             .run_finality()
             // TODO: https://casperlabs.atlassian.net/browse/HWY-119
-            .expect("FTT exceeded but not handled");
+            .expect("FTT exceeded but not handled"); //?expect
         for FinalizedBlock {
             value,
             timestamp: _,
@@ -814,12 +814,14 @@ impl<DS: DeliveryStrategy> HighwayTestHarnessBuilder<DS> {
     }
 
     pub(crate) fn consensus_values_count(mut self, count: u8) -> Self {
+        //?assert
         assert!(count > 0, "count should be greater than 0");
         self.consensus_values_count = count;
         self
     }
 
     pub(crate) fn weight_limits(mut self, lower: u64, upper: u64) -> Self {
+        //?assert
         assert!(
             lower >= 100,
             "Lower limit has to be higher than 100 to avoid rounding problems."
@@ -930,7 +932,7 @@ impl<DS: DeliveryStrategy> HighwayTestHarnessBuilder<DS> {
         // Local function creating an instance of `HighwayConsensus` for a single validator.
         let highway_consensus =
             |(vid, secrets): (ValidatorId, &mut HashMap<ValidatorId, TestSecret>)| {
-                let v_sec = secrets.remove(&vid).expect("Secret key should exist.");
+                let v_sec = secrets.remove(&vid).expect("Secret key should exist."); //?expect
 
                 let mut highway = Highway::new(instance_id, validators.clone(), params.clone());
                 let effects = highway.activate_validator(vid, v_sec, start_time, None, Weight(ftt));
@@ -1090,7 +1092,6 @@ mod test_harness {
                 .expect("Construction was successful");
 
         highway_test_harness.mutable_handle().clear_message_queue();
-        //? Change assert-->debug_assert+error! ?
         assert_eq!(
             highway_test_harness.crank(&mut rng),
             Err(TestRunError::NoMessages),
@@ -1102,8 +1103,6 @@ mod test_harness {
     fn assert_eq_vectors<I: Eq + Debug>(coll: Vec<I>, error_msg: &str) {
         let mut iter = coll.into_iter();
         let reference = iter.next().expect("coll should not be empty");
-
-        //? Change assert-->debug_assert+error! ?
         iter.for_each(|v| assert_eq!(v, reference, "{}", error_msg));
     }
 
@@ -1156,7 +1155,6 @@ mod test_harness {
                 // one round (one consensus value) – 1 message. 1/2=0 but 3/2=1 b/c of the rounding.
                 let rounds_participated_in = (units_count as u8 + 1) / 2;
 
-                //? Change assert-->debug_assert+error! ?
                 assert_eq!(
                     rounds_participated_in, cv_count,
                     "Expected that validator={} participated in {} rounds.",
@@ -1307,10 +1305,12 @@ mod test_harness {
             .expect("should have at least one correct validator");
         let finalized_before_pause = first_validator.finalized_count();
         let unit_count_before_pause = first_validator.unit_count();
+
         assert_ne!(
             finalized_before_pause, 0,
             "finalized_before_pause should not be zero"
         );
+
         assert!(
             finalized_before_pause < cv_count as usize,
             "finalized_before_pause should be less than cv_count"

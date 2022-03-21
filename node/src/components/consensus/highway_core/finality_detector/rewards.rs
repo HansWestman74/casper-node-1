@@ -29,6 +29,7 @@ pub(crate) fn compute_rewards<C: Context>(state: &State<C>, bhash: &C::Hash) -> 
                 // Rewards should not overflow. We use one trillion for a block reward, so the full
                 // rewards for 18 million blocks fit into a u64.
                 None => panic!(
+                    //?panic
                     "rewards for {:?}, {} + {}, overflow u64",
                     vidx, rewards[vidx], r
                 ),

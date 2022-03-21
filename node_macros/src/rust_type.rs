@@ -34,7 +34,7 @@ impl RustType {
         self.0
             .segments
             .last()
-            .expect("type has no last part?")
+            .expect("type has no last part?") //?expect
             .arguments
             .clone()
     }
@@ -44,7 +44,7 @@ impl RustType {
         self.0
             .segments
             .last()
-            .expect("type has no last part?")
+            .expect("type has no last part?") //?expect
             .ident
             .clone()
     }
@@ -56,7 +56,7 @@ impl RustType {
             .0
             .segments
             .last()
-            .expect("type has no last part?")
+            .expect("type has no last part?") //?expect
             .ident
             .clone();
 

@@ -230,33 +230,33 @@ pub fn cl_value_arb() -> impl Strategy<Value = CLValue> {
     };
 
     prop_oneof![
-        Just(CLValue::from_t(()).expect("should create CLValue")),
-        any::<bool>().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
-        any::<i32>().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
-        any::<i64>().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
-        any::<u8>().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
-        any::<u32>().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
-        any::<u64>().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
-        u128_arb().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
-        u256_arb().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
-        u512_arb().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
-        key_arb().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
-        uref_arb().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
-        ".*".prop_map(|x: String| CLValue::from_t(x).expect("should create CLValue")),
-        option::of(any::<u64>()).prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
+        Just(CLValue::from_t(()).expect("should create CLValue")),//?expect
+        any::<bool>().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
+        any::<i32>().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
+        any::<i64>().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
+        any::<u8>().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
+        any::<u32>().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
+        any::<u64>().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
+        u128_arb().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
+        u256_arb().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
+        u512_arb().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
+        key_arb().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
+        uref_arb().prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
+        ".*".prop_map(|x: String| CLValue::from_t(x).expect("should create CLValue")),//?expect
+        option::of(any::<u64>()).prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
         collection::vec(uref_arb(), 0..100)
-            .prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
+            .prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
         result::maybe_err(key_arb(), ".*")
-            .prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
+            .prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
         collection::btree_map(".*", u512_arb(), 0..100)
-            .prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
+            .prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
         (any::<bool>()).prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
         (any::<bool>(), any::<i32>())
-            .prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
+            .prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
         (any::<bool>(), any::<i32>(), any::<i64>())
-            .prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),
+            .prop_map(|x| CLValue::from_t(x).expect("should create CLValue")),//?expect
         // Fixed lists of any size
-        any::<u8>().prop_map(|len| CLValue::from_t([len; 32]).expect("should create CLValue")),
+        any::<u8>().prop_map(|len| CLValue::from_t([len; 32]).expect("should create CLValue")),//?expect
     ]
 }
 
@@ -437,7 +437,7 @@ pub(crate) fn bid_arb(delegations_len: impl Into<SizeRange>) -> impl Strategy<Va
                 };
                 let delegators = bid.delegators_mut();
                 new_delegators.into_iter().for_each(|delegator| {
-                    //? Change assert-->debug_assert+error! ?
+                    //?assert
                     assert!(
                         delegators
                             .insert(delegator.delegator_public_key().clone(), delegator)

@@ -81,12 +81,12 @@ where
             }
             Trie::Node { pointer_block } => {
                 let index: usize = {
-                    //? Change assert-->debug_assert+error! ?
+                    //?assert
                     assert!(depth < path.len(), "depth must be < {}", path.len());
                     path[depth].into()
                 };
                 let maybe_pointer: Option<Pointer> = {
-                    //? Change assert-->debug_assert+error! ?
+                    //?assert
                     assert!(index < RADIX, "key length must be < {}", RADIX);
                     pointer_block[index]
                 };
@@ -98,6 +98,7 @@ where
                         }
                         None => {
                             panic!(
+                                //?panic
                                 "No trie value at key: {:?} (reading from key: {:?})",
                                 pointer.hash(),
                                 key
@@ -119,6 +120,7 @@ where
                         }
                         None => {
                             panic!(
+                                //?panic
                                 "No trie value at key: {:?} (reading from key: {:?})",
                                 pointer.hash(),
                                 key
@@ -176,12 +178,12 @@ where
             }
             Trie::Node { pointer_block } => {
                 let hole_index: usize = {
-                    //? Change assert-->debug_assert+error! ?
+                    //?assert
                     assert!(depth < path.len(), "depth must be < {}", path.len());
                     path[depth].into()
                 };
                 let pointer: Pointer = {
-                    //? Change assert-->debug_assert+error! ?
+                    //?assert
                     assert!(hole_index < RADIX, "key length must be < {}", RADIX);
                     match pointer_block[hole_index] {
                         Some(pointer) => pointer,
@@ -196,6 +198,7 @@ where
                     Some(next) => next,
                     None => {
                         panic!(
+                            //?panic
                             "No trie value at key: {:?} (reading from key: {:?})",
                             pointer.hash(),
                             key
@@ -204,7 +207,7 @@ where
                 };
                 depth += 1;
                 current = next;
-                let hole_index: u8 = hole_index.try_into().expect(USIZE_EXCEEDS_U8);
+                let hole_index: u8 = hole_index.try_into().expect(USIZE_EXCEEDS_U8); //?expect
                 proof_steps.push_front(TrieMerkleProofStep::node(
                     hole_index,
                     indexed_pointers_with_hole,
@@ -220,6 +223,7 @@ where
                     Some(next) => next,
                     None => {
                         panic!(
+                            //?panic
                             "No trie value at key: {:?} (reading from key: {:?})",
                             pointer.hash(),
                             key
@@ -321,7 +325,7 @@ where
     for state_root in &trie_keys_to_visit {
         match store.get(txn, state_root)? {
             Some(Trie::Node { .. }) => {}
-            _ => panic!("Should have a pointer block node as state root"),
+            _ => panic!("Should have a pointer block node as state root"), //?panic
         }
     }
     let mut trie_keys_to_visit: Vec<(Vec<u8>, Digest)> = trie_keys_to_visit
@@ -338,6 +342,7 @@ where
             let hash_of_trie_value = trie_value.trie_hash()?;
             if trie_key != hash_of_trie_value {
                 panic!(
+                    //?panic
                     "Trie key {:?} has corrupted value {:?} (hash of value is {:?})",
                     trie_key, trie_value, hash_of_trie_value
                 );
@@ -346,13 +351,13 @@ where
         match maybe_retrieved_trie {
             // If we can't find the trie_key; it is missing and we'll return it
             None => {
-                panic!("Missing trie key: {:?}", trie_key)
+                panic!("Missing trie key: {:?}", trie_key) //?panic
             }
             // If we could retrieve the node and it is a leaf, the search can move on
             Some(Trie::Leaf { key, .. }) => {
                 let key_bytes = key.to_bytes()?;
                 if !key_bytes.starts_with(&path) {
-                    panic!(
+                    panic!( //?panic
                         "Trie key {:?} belongs to a leaf with a corrupted affix. Key bytes: {:?}, Path: {:?}.",
                         trie_key, key_bytes, path
                     );
@@ -426,13 +431,13 @@ where
             }
             Trie::Node { pointer_block } => {
                 let index = {
-                    //? Change assert-->debug_assert+error! ?
+                    //?assert
                     assert!(depth < path.len(), "depth must be < {}", path.len());
                     path[depth]
                 };
                 let maybe_pointer: Option<Pointer> = {
                     let index: usize = index.into();
-                    //? Change assert-->debug_assert+error! ?
+                    //?assert
                     assert!(index < RADIX, "index must be < {}", RADIX);
                     pointer_block[index]
                 };
@@ -450,6 +455,7 @@ where
                     }
                     None => {
                         panic!(
+                            //?panic
                             "No trie value at key: {:?} (reading from path: {:?})",
                             pointer.hash(),
                             path
@@ -465,7 +471,7 @@ where
                 match store.get(txn, pointer.hash())? {
                     Some(next) => {
                         let index = {
-                            //? Change assert-->debug_assert+error! ?
+                            //?assert
                             assert!(depth < path.len(), "depth must be < {}", path.len());
                             path[depth]
                         };
@@ -475,6 +481,7 @@ where
                     }
                     None => {
                         panic!(
+                            //?panic
                             "No trie value at key: {:?} (reading from path: {:?})",
                             pointer.hash(),
                             path
@@ -528,9 +535,9 @@ where
 
     while let Some((idx, parent)) = parents.pop() {
         match (new_elements.last_mut(), parent) {
-            (_, Trie::Leaf { .. }) => panic!("Should not find leaf"),
-            (None, Trie::Extension { .. }) => panic!("Extension node should never end in leaf"),
-            (Some((_, Trie::Leaf { .. })), _) => panic!("New elements should never contain a leaf"),
+            (_, Trie::Leaf { .. }) => panic!("Should not find leaf"), //?panic
+            (None, Trie::Extension { .. }) => panic!("Extension node should never end in leaf"), //?panic
+            (Some((_, Trie::Leaf { .. })), _) => panic!("New elements should never contain a leaf"), //?panic
             // The parent is the node which pointed to the leaf we deleted, and that leaf had
             // multiple siblings.
             (None, Trie::Node { mut pointer_block }) if pointer_block.child_count() > 2 => {
@@ -563,7 +570,7 @@ where
                 };
                 // There is one sibling.
                 match (sibling_pointer, parents.pop()) {
-                    (_, Some((_, Trie::Leaf { .. }))) => panic!("Should not have leaf in scan"),
+                    (_, Some((_, Trie::Leaf { .. }))) => panic!("Should not have leaf in scan"), //?panic
                     // There is no grandparent.  Therefore the parent is the root node.  Output the
                     // root node with the index zeroed out.
                     (_, None) => {
@@ -584,10 +591,10 @@ where
                     // The sibling is a leaf and the grandparent is an extension.
                     (Pointer::LeafPointer(..), Some((_, Trie::Extension { .. }))) => {
                         match parents.pop() {
-                            None => panic!("Root node cannot be an extension node"),
-                            Some((_, Trie::Leaf { .. })) => panic!("Should not find leaf"),
+                            None => panic!("Root node cannot be an extension node"), //?panic
+                            Some((_, Trie::Leaf { .. })) => panic!("Should not find leaf"), //?panic
                             Some((_, Trie::Extension { .. })) => {
-                                panic!("Extension cannot extend to an extension")
+                                panic!("Extension cannot extend to an extension") //?panic
                             }
                             // The great-grandparent is a node. Reseat the single leaf sibling into
                             // the position the grandparent was in.
@@ -608,10 +615,10 @@ where
                         // trie values.
                         let sibling_trie = store
                             .get(txn, &sibling_trie_key)?
-                            .expect("should have sibling");
+                            .expect("should have sibling"); //?expect
                         match sibling_trie {
                             Trie::Leaf { .. } => {
-                                panic!("Node pointer should not point to leaf")
+                                panic!("Node pointer should not point to leaf") //?panic
                             }
                             // The single sibling is a node, and there exists a grandparent.
                             // Therefore the parent is not the root.  We output an extension to
@@ -720,7 +727,7 @@ where
     for (index, parent) in parents.into_iter().rev() {
         match parent {
             Trie::Leaf { .. } => {
-                panic!("parents should not contain any leaves");
+                panic!("parents should not contain any leaves"); //?panic
             }
             Trie::Node { mut pointer_block } => {
                 tip = {
@@ -785,7 +792,7 @@ where
     // TODO: add is_node() method to Trie
     match new_parent_node {
         Trie::Node { .. } => (),
-        _ => panic!("new_parent must be a node"),
+        _ => panic!("new_parent must be a node"), //?panic
     }
     // The current depth will be the length of the path to the new parent node.
     let depth: usize = {
@@ -793,7 +800,7 @@ where
         let path_to_node: Vec<u8> = get_parents_path(&parents);
         // Check that the path to the node is a prefix of the current path
         let current_path = common_prefix(path_to_leaf, &path_to_node);
-        //? Change assert-->debug_assert+error!
+        //?assert_eq
         assert_eq!(
             current_path, path_to_node,
             "current_path must be the same as path_to_node"
@@ -805,7 +812,7 @@ where
     };
     // Index path by current depth;
     let index = {
-        //? Change assert-->debug_assert+error! ?
+        //?assert
         assert!(
             depth < path_to_leaf.len(),
             "depth must be < {}",
@@ -834,10 +841,10 @@ where
     V: ToBytes,
 {
     let mut parents = parents;
-    let (child_index, parent) = parents.pop().expect("parents should not be empty");
+    let (child_index, parent) = parents.pop().expect("parents should not be empty"); //?expect
     let pointer_block = match parent {
         Trie::Node { pointer_block } => pointer_block,
-        _ => panic!("A leaf should have a node for its parent"),
+        _ => panic!("A leaf should have a node for its parent"), //?panic
     };
     // Get the path that the new leaf and existing leaf share
     let shared_path = common_prefix(new_leaf_path, existing_leaf_path);
@@ -846,7 +853,7 @@ where
     let new_node = {
         let index = existing_leaf_path[shared_path.len()];
         let existing_leaf_pointer =
-            pointer_block[<usize>::from(child_index)].expect("parent has lost the existing leaf");
+            pointer_block[<usize>::from(child_index)].expect("parent has lost the existing leaf"); //?expect
         Trie::node(&[(index, existing_leaf_pointer)])
     };
     // Re-add the parent node to parents
@@ -892,7 +899,7 @@ where
     // TODO: add is_extension() method to Trie
     let (affix, pointer) = match existing_extension {
         Trie::Extension { affix, pointer } => (affix, pointer),
-        _ => panic!("existing_extension must be an extension"),
+        _ => panic!("existing_extension must be an extension"), //?panic
     };
     let parents_path = get_parents_path(&parents);
     // Get the path to the existing extension node

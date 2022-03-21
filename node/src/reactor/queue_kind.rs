@@ -70,7 +70,7 @@ impl QueueKind {
             QueueKind::Regular => 8,
             QueueKind::Api => 16,
         })
-        .expect("weight must be positive")
+        .expect("weight must be positive") //?expect
     }
 
     /// Return weights of all possible `Queue`s.

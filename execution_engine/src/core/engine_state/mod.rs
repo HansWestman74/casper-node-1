@@ -197,7 +197,7 @@ where
             Ok(Some(tracking_copy)) => Rc::new(RefCell::new(tracking_copy)),
             // NOTE: As genesis is run once per instance condition below is considered programming
             // error
-            Ok(None) => panic!("state has not been initialized properly"),
+            Ok(None) => panic!("state has not been initialized properly"), //?panic
             Err(error) => return Err(error),
         };
 
@@ -1252,7 +1252,7 @@ where
 
         let execution_result = execution_result_builder
             .build()
-            .expect("ExecutionResultBuilder not initialized properly");
+            .expect("ExecutionResultBuilder not initialized properly"); //?expect
 
         Ok(execution_result)
     }
@@ -1831,7 +1831,7 @@ where
         // We panic here to indicate that the builder was not used properly.
         let ret = execution_result_builder
             .build()
-            .expect("ExecutionResultBuilder not initialized properly");
+            .expect("ExecutionResultBuilder not initialized properly"); //?expect
 
         // NOTE: payment_code_spec_5_a is enforced in execution_result_builder.build()
         // payment_code_spec_6: return properly combined set of transforms and

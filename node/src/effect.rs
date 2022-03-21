@@ -485,7 +485,7 @@ impl<REv> EffectBuilder<REv> {
                 // We cannot produce any value to satisfy the request, so we just abandon this task
                 // by waiting on a resource we can never acquire.
                 let _ = UNOBTAINABLE.acquire().await;
-                panic!("should never obtain unobtainable semaphore");
+                panic!("should never obtain unobtainable semaphore"); //?panic
             }
         }
     }
@@ -660,7 +660,7 @@ impl<REv> EffectBuilder<REv> {
     where
         REv: From<GossiperAnnouncement<T>>,
     {
-        //? Change assert-->debug_assert+error! ?
+        //?assert
         assert!(
             T::ID_IS_COMPLETE_ITEM,
             "{} must be an item where the ID _is_ the complete item",

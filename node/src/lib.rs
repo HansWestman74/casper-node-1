@@ -118,7 +118,7 @@ pub(crate) fn setup_signal_hooks() {
             Arc::clone(&*TERMINATION_REQUESTED),
             *signal as usize,
         )
-        .unwrap_or_else(|error| panic!("failed to register signal {}: {}", signal, error));
+        .unwrap_or_else(|error| panic!("failed to register signal {}: {}", signal, error)); //?panic
     }
     let _ = flag::register(SIGUSR1, Arc::clone(&*DEBUG_DUMP_REQUESTED));
     let _ = flag::register(SIGUSR2, Arc::clone(&*JSON_DUMP_REQUESTED));

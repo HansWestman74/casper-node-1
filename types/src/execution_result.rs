@@ -188,7 +188,7 @@ impl ExecutionResult {
     fn tag_byte(&self) -> u8 {
         self.tag()
             .to_u8()
-            .expect("ExecutionResultTag should be represented as u8")
+            .expect("ExecutionResultTag should be represented as u8") //?expect
     }
 
     fn tag(&self) -> ExecutionResultTag {
@@ -445,7 +445,7 @@ impl OpKind {
     fn tag_byte(&self) -> u8 {
         self.tag()
             .to_u8()
-            .expect("OpTag should be represented as u8")
+            .expect("OpTag should be represented as u8") //?expect
     }
 
     fn tag(&self) -> OpTag {
@@ -562,7 +562,7 @@ impl Transform {
     fn tag_byte(&self) -> u8 {
         self.tag()
             .to_u8()
-            .expect("TransformTag should be representable as a u8")
+            .expect("TransformTag should be representable as a u8") //?expect
     }
 
     fn tag(&self) -> TransformTag {
