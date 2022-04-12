@@ -2,7 +2,7 @@ use rand::Rng;
 
 use casper_engine_test_support::{
     DeployItemBuilder, ExecuteRequestBuilder, InMemoryWasmTestBuilder, DEFAULT_ACCOUNTS,
-    DEFAULT_ACCOUNT_ADDR,
+    DEFAULT_ACCOUNT_ADDR, DEFAULT_PAYMENT,
 };
 use casper_execution_engine::{
     core::engine_state::ExecuteRequest, storage::transaction_source::in_memory::InMemoryEnvironment,
@@ -11,13 +11,14 @@ use casper_types::{
     account::AccountHash, bytesrepr::FromBytes, runtime_args, system::mint, CLTyped, Contract,
     ContractHash, ContractPackageHash, Key, PublicKey, RuntimeArgs, URef, U512,
 };
+use regex::internal::Exec;
 
 use super::{
     ARG_AMOUNT, ARG_AVAILABLE_AMOUNT, ARG_DISTRIBUTIONS_PER_INTERVAL, ARG_ID, ARG_TARGET,
-    ARG_TIME_INTERVAL, ENTRY_POINT_AUTHORIZE_TO, ENTRY_POINT_FAUCET, ENTRY_POINT_SET_VARIABLES,
-    FAUCET_CALL_DEFAULT_PAYMENT, FAUCET_CONTRACT_NAMED_KEY, FAUCET_FUND_AMOUNT, FAUCET_ID,
-    FAUCET_INSTALLER_SESSION, FAUCET_PURSE_NAMED_KEY, INSTALLER_ACCOUNT, INSTALLER_FUND_AMOUNT,
-    REMAINING_REQUESTS_NAMED_KEY, TWO_HOURS_AS_MILLIS,
+    ARG_TIME_INTERVAL, AVAILABLE_AMOUNT_NAMED_KEY, ENTRY_POINT_AUTHORIZE_TO, ENTRY_POINT_FAUCET,
+    ENTRY_POINT_SET_VARIABLES, FAUCET_CALL_DEFAULT_PAYMENT, FAUCET_CONTRACT_NAMED_KEY,
+    FAUCET_FUND_AMOUNT, FAUCET_ID, FAUCET_INSTALLER_SESSION, FAUCET_PURSE_NAMED_KEY,
+    INSTALLER_ACCOUNT, INSTALLER_FUND_AMOUNT, REMAINING_REQUESTS_NAMED_KEY, TWO_HOURS_AS_MILLIS,
 };
 
 #[derive(Clone, Copy, Debug)]
@@ -406,6 +407,91 @@ pub fn get_faucet_purse(builder: &InMemoryWasmTestBuilder, installer_account: Ac
         .cloned()
         .and_then(Key::into_uref)
         .expect("failed to find faucet purse")
+}
+
+pub fn set_variable_request(
+    assigned_available_amount: U512,
+    assigned_time_interval: u64,
+    assigned_distributions_per_interval: u64,
+    installer_account: AccountHash,
+) -> ExecuteRequest {
+    let deploy_item = DeployItemBuilder::new()
+        .with_address(installer_account)
+        .with_authorization_keys(&[installer_account])
+        .with_stored_session_named_key(
+            &format!("{}_{}", FAUCET_CONTRACT_NAMED_KEY, FAUCET_ID),
+            ENTRY_POINT_SET_VARIABLES,
+            runtime_args! {
+                ARG_AVAILABLE_AMOUNT => Some(assigned_available_amount),
+                ARG_TIME_INTERVAL =>  Some(assigned_time_interval),
+                ARG_DISTRIBUTIONS_PER_INTERVAL => Some(assigned_distributions_per_interval)
+            },
+        )
+        .with_empty_payment_bytes(runtime_args! {ARG_AMOUNT => *DEFAULT_PAYMENT})
+        .with_deploy_hash([3; 32])
+        .build();
+
+    ExecuteRequestBuilder::from_deploy_item(deploy_item).build()
+}
+
+pub fn call_entry_point(
+    entry_point_name: &str,
+    account_hash: AccountHash,
+    runtime_args: RuntimeArgs,
+    deploy_hash: [u8; 32],
+    block_time: u64,
+) -> ExecuteRequest {
+    let deploy_item = DeployItemBuilder::new()
+        .with_address(account_hash)
+        .with_authorization_keys(&[account_hash])
+        .with_stored_session_named_key(
+            &format!("{}_{}", FAUCET_CONTRACT_NAMED_KEY, FAUCET_ID),
+            entry_point_name,
+            runtime_args,
+        )
+        .with_empty_payment_bytes(runtime_args! {ARG_AMOUNT => *DEFAULT_PAYMENT})
+        .with_deploy_hash(deploy_hash)
+        .build();
+
+    ExecuteRequestBuilder::from_deploy_item(deploy_item)
+        .with_block_time(block_time)
+        .build()
+}
+
+pub fn get_available_amount(
+    builder: &InMemoryWasmTestBuilder,
+    faucet_contract_hash: ContractHash,
+) -> U512 {
+    builder
+        .query(
+            None,
+            faucet_contract_hash.into(),
+            &[AVAILABLE_AMOUNT_NAMED_KEY.to_string()],
+        )
+        .expect("failed to find available amount named key")
+        .as_cl_value()
+        .cloned()
+        .expect("failed to convert to cl value")
+        .into_t::<U512>()
+        .expect("failed to convert into U512")
+}
+
+pub fn get_remaining_requests(
+    builder: &InMemoryWasmTestBuilder,
+    faucet_contract_hash: ContractHash,
+) -> U512 {
+    builder
+        .query(
+            None,
+            faucet_contract_hash.into(),
+            &[REMAINING_REQUESTS_NAMED_KEY.to_string()],
+        )
+        .expect("failed to find available amount named key")
+        .as_cl_value()
+        .cloned()
+        .expect("failed to convert to cl value")
+        .into_t::<U512>()
+        .expect("failed to convert into U512")
 }
 
 pub struct FaucetDeployHelper {

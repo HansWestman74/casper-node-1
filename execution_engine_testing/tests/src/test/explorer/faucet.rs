@@ -10,12 +10,16 @@ use casper_types::{
     RuntimeArgs, SecretKey, U512,
 };
 
+use crate::test::explorer::faucet_test_helpers::{
+    call_entry_point, get_available_amount, get_remaining_requests, set_variable_request,
+};
+
 // test constants.
 use super::{
     faucet_test_helpers::{
-        query_stored_value, FaucetAuthorizeAccountRequestBuilder, FaucetConfigRequestBuilder,
-        FaucetDeployHelper, FaucetFundRequestBuilder, FaucetInstallSessionRequestBuilder,
-        FundAccountRequestBuilder,
+        get_faucet_contract, get_faucet_contract_hash, get_faucet_purse, query_stored_value,
+        FaucetAuthorizeAccountRequestBuilder, FaucetConfigRequestBuilder, FaucetDeployHelper,
+        FaucetFundRequestBuilder, FaucetInstallSessionRequestBuilder, FundAccountRequestBuilder,
     },
     ARG_AMOUNT, ARG_AVAILABLE_AMOUNT, ARG_DISTRIBUTIONS_PER_INTERVAL, ARG_ID, ARG_TARGET,
     ARG_TIME_INTERVAL, AUTHORIZED_ACCOUNT_NAMED_KEY, AVAILABLE_AMOUNT_NAMED_KEY,
@@ -401,211 +405,123 @@ fn should_not_fund_once_exhausted2() {
 #[ignore]
 #[test]
 fn should_not_fund_once_exhausted_refactored() {
+    let installer_account = AccountHash::new([1u8; 32]);
     let user_account = AccountHash::new([2u8; 32]);
-    let five_cspr = U512::from(5_000_000_000u64);
 
     let mut builder = InMemoryWasmTestBuilder::default();
     builder.run_genesis(&DEFAULT_RUN_GENESIS_REQUEST).commit();
 
-    let mut helper = FaucetDeployHelper::new()
-        .with_faucet_purse_fund_amount(five_cspr)
-        .with_faucet_available_amount(Some(five_cspr))
-        .with_faucet_distributions_per_interval(Some(4))
-        .with_faucet_time_interval(Some(10_000u64));
+    // Fund installer account
+    let fund_installer_account_request = FundAccountRequestBuilder::new()
+        .with_target_account(installer_account)
+        .with_fund_amount(INSTALLER_FUND_AMOUNT.into())
+        .build();
 
     builder
-        .exec(helper.fund_installer_request())
+        .exec(fund_installer_account_request)
         .expect_success()
         .commit();
 
+    let faucet_fund_amount = U512::from(400_000_000_000_000u64);
+    let half_of_faucet_fund_amount = faucet_fund_amount / 2;
+    let faucet_install_request = FaucetInstallSessionRequestBuilder::new()
+        .with_faucet_fund_amount(faucet_fund_amount)
+        .with_installer_account(installer_account)
+        .build();
+
     builder
-        .exec(helper.faucet_install_request())
+        .exec(faucet_install_request)
         .expect_success()
         .commit();
 
-    // let fund_installer_account_request = ExecuteRequestBuilder::transfer(
-    //     *DEFAULT_ACCOUNT_ADDR,
-    //     runtime_args! {
-    //         mint::ARG_TARGET => installer_account,
-    //         mint::ARG_AMOUNT => INSTALLER_FUND_AMOUNT,
-    //         mint::ARG_ID => <Option<u64>>::None
-    //     },
-    // )
-    // .build();
+    let faucet_contract_hash = get_faucet_contract_hash(&builder, installer_account);
+    let faucet_contract = get_faucet_contract(&builder, installer_account);
+    let faucet_purse = get_faucet_purse(&builder, installer_account);
+    let faucet_purse_balance = builder.get_purse_balance(faucet_purse);
 
-    // builder
-    //     .exec(fund_installer_account_request)
-    //     .expect_success()
-    //     .commit();
+    assert_eq!(faucet_purse_balance, faucet_fund_amount);
 
-    // let faucet_fund_amount = U512::from(400_000_000_000_000u64);
-    // let half_of_faucet_fund_amount = faucet_fund_amount / 2;
-    // let installer_session_request = ExecuteRequestBuilder::standard(
-    //     installer_account,
-    //     FAUCET_INSTALLER_SESSION,
-    //     runtime_args! {ARG_ID => FAUCET_ID, ARG_AMOUNT => faucet_fund_amount},
-    // )
-    // .build();
+    let available_amount = get_available_amount(&builder, faucet_contract_hash);
+    assert_eq!(available_amount, U512::zero());
 
-    // builder
-    //     .exec(installer_session_request)
-    //     .expect_success()
-    //     .commit();
+    let assigned_time_interval = 10_000u64;
+    let assigned_distributions_per_interval = 4u64;
+    let assigned_available_amount = half_of_faucet_fund_amount;
+    let one_distribution = assigned_available_amount / assigned_distributions_per_interval;
 
-    // let faucet_contract_hash = builder
-    //     .get_expected_account(installer_account)
-    //     .named_keys()
-    //     .get(&format!("{}_{}", FAUCET_CONTRACT_NAMED_KEY, FAUCET_ID))
-    //     .cloned()
-    //     .and_then(Key::into_hash)
-    //     .map(ContractHash::new)
-    //     .expect("failed to find faucet contract");
+    let installer_set_variable = set_variable_request(
+        assigned_available_amount,
+        assigned_time_interval,
+        assigned_distributions_per_interval,
+        installer_account,
+    );
 
-    // // check the balance of the faucet's purse before
-    // let faucet_contract = builder
-    //     .get_contract(faucet_contract_hash)
-    //     .expect("failed to find faucet contract");
+    builder
+        .exec(installer_set_variable)
+        .expect_success()
+        .commit();
 
-    // let faucet_purse = faucet_contract
-    //     .named_keys()
-    //     .get(FAUCET_PURSE_NAMED_KEY)
-    //     .cloned()
-    //     .and_then(Key::into_uref)
-    //     .expect("failed to find faucet purse");
+    let available_amount = get_available_amount(&builder, faucet_contract_hash);
+    assert_eq!(available_amount, half_of_faucet_fund_amount);
 
-    // let faucet_purse_balance = builder.get_purse_balance(faucet_purse);
-    // assert_eq!(faucet_purse_balance, faucet_fund_amount);
+    let remaining_requests = get_remaining_requests(&builder, faucet_contract_hash);
 
-    // let available_amount = builder
-    //     .query(
-    //         None,
-    //         faucet_contract_hash.into(),
-    //         &[AVAILABLE_AMOUNT_NAMED_KEY.to_string()],
-    //     )
-    //     .expect("failed to find available amount named key")
-    //     .as_cl_value()
-    //     .cloned()
-    //     .expect("failed to convert to cl value")
-    //     .into_t::<U512>()
-    //     .expect("failed to convert into U512");
+    assert_eq!(
+        remaining_requests,
+        U512::from(assigned_distributions_per_interval)
+    );
 
-    // // the available amount per interval will be zero until the installer calls
-    // // the set_variable entrypoint to finish setup.
-    // assert_eq!(available_amount, U512::zero());
+    let user_fund_amount = U512::from(3_000_000_000u64);
+    let num_funds = 4;
+    let faucet_call_by_installer = call_entry_point(
+        ENTRY_POINT_FAUCET,
+        installer_account,
+        runtime_args! {
+            ARG_TARGET => user_account,
+            ARG_AMOUNT => user_fund_amount * num_funds,
+            ARG_ID => <Option<u64>>::None
+        },
+        [130; 32],
+        1000,
+    );
 
-    // let assigned_time_interval = 10_000u64;
-    // let assigned_distributions_per_interval = 4u64;
-    // let assigned_available_amount = half_of_faucet_fund_amount;
-    // let one_distribution = assigned_available_amount / assigned_distributions_per_interval;
-    // let installer_set_variable_request = {
-    //     let deploy_item = DeployItemBuilder::new()
-    //         .with_address(installer_account)
-    //         .with_authorization_keys(&[installer_account])
-    //         .with_stored_session_named_key(
-    //             &format!("{}_{}", FAUCET_CONTRACT_NAMED_KEY, FAUCET_ID),
-    //             ENTRY_POINT_SET_VARIABLES,
-    //             runtime_args! {
-    //                 ARG_AVAILABLE_AMOUNT => Some(assigned_available_amount),
-    //                 ARG_TIME_INTERVAL =>  Some(assigned_time_interval),
-    //                 ARG_DISTRIBUTIONS_PER_INTERVAL => Some(assigned_distributions_per_interval)
-    //             },
-    //         )
-    //         .with_empty_payment_bytes(runtime_args! {ARG_AMOUNT => *DEFAULT_PAYMENT})
-    //         .with_deploy_hash([3; 32])
-    //         .build();
-
-    //     ExecuteRequestBuilder::from_deploy_item(deploy_item).build()
-    // };
-
-    // builder
-    //     .exec(installer_set_variable_request)
-    //     .expect_success()
-    //     .commit();
-
-    // let available_amount = builder
-    //     .query(
-    //         None,
-    //         faucet_contract_hash.into(),
-    //         &[AVAILABLE_AMOUNT_NAMED_KEY.to_string()],
-    //     )
-    //     .expect("failed to find available amount named key")
-    //     .as_cl_value()
-    //     .cloned()
-    //     .expect("failed to convert to cl value")
-    //     .into_t::<U512>()
-    //     .expect("failed to convert into U512");
-
-    // assert_eq!(available_amount, half_of_faucet_fund_amount);
-
-    // let remaining_requests = builder
-    //     .query(
-    //         None,
-    //         faucet_contract_hash.into(),
-    //         &[REMAINING_REQUESTS_NAMED_KEY.to_string()],
-    //     )
-    //     .expect("failed to find available amount named key")
-    //     .as_cl_value()
-    //     .cloned()
-    //     .expect("failed to convert to cl value")
-    //     .into_t::<U512>()
-    //     .expect("failed to convert into U512");
-
-    // assert_eq!(
-    //     remaining_requests,
-    //     U512::from(assigned_distributions_per_interval)
-    // );
-
-    // let user_account = AccountHash::new([2u8; 32]);
-    // let user_fund_amount = U512::from(3_000_000_000u64);
-    // let num_funds = 4;
-    // let faucet_call_by_installer = {
-    //     let deploy_item = DeployItemBuilder::new()
-    //         .with_address(installer_account)
-    //         .with_authorization_keys(&[installer_account])
-    //         .with_stored_session_named_key(
-    //             &format!("{}_{}", FAUCET_CONTRACT_NAMED_KEY, FAUCET_ID),
-    //             ENTRY_POINT_FAUCET,
-    //             runtime_args! {
-    //                 ARG_TARGET => user_account,
-    //                 ARG_AMOUNT => user_fund_amount * num_funds,
-    //                 ARG_ID => <Option<u64>>::None
-    //             },
-    //         )
-    //         .with_empty_payment_bytes(runtime_args! {ARG_AMOUNT => *DEFAULT_PAYMENT})
-    //         .with_deploy_hash([130; 32])
-    //         .build();
-
-    //     ExecuteRequestBuilder::from_deploy_item(deploy_item)
-    //         .with_block_time(1000)
-    //         .build()
-    // };
-
-    // builder
-    //     .exec(faucet_call_by_installer)
-    //     .expect_success()
-    //     .commit();
+    builder
+        .exec(faucet_call_by_installer)
+        .expect_success()
+        .commit();
 
     // for i in 0..num_funds {
-    //     let faucet_call_by_user = {
-    //         let deploy_item = DeployItemBuilder::new()
-    //             .with_address(user_account)
-    //             .with_authorization_keys(&[user_account])
-    //             .with_stored_session_hash(
-    //                 faucet_contract_hash,
-    //                 ENTRY_POINT_FAUCET,
-    //                 runtime_args! {ARG_TARGET => user_account, ARG_ID => <Option<u64>>::None},
-    //             )
-    //             .with_empty_payment_bytes(runtime_args! {ARG_AMOUNT => user_fund_amount})
-    //             .with_deploy_hash([i + 10; 32])
-    //             .build();
-
-    //         ExecuteRequestBuilder::from_deploy_item(deploy_item)
-    //             .with_block_time(1000 + i as u64)
-    //             .build()
-    //     };
-
+    //     let faucet_call_by_user = call_entry_point(
+    //         ENTRY_POINT_FAUCET,
+    //         user_account,
+    //         runtime_args! {ARG_TARGET => user_account, ARG_ID => <Option<u64>>::None},
+    //         [i + 10; 32],
+    //         (i as u64) + (1000 as u64),
+    //     );
     //     builder.exec(faucet_call_by_user).expect_success().commit();
     // }
+
+    for i in 0..num_funds {
+        let faucet_call_by_user = {
+            let deploy_item = DeployItemBuilder::new()
+                .with_address(user_account)
+                .with_authorization_keys(&[user_account])
+                .with_stored_session_hash(
+                    faucet_contract_hash,
+                    ENTRY_POINT_FAUCET,
+                    runtime_args! {ARG_TARGET => user_account, ARG_ID => <Option<u64>>::None},
+                )
+                .with_empty_payment_bytes(runtime_args! {ARG_AMOUNT => user_fund_amount})
+                .with_deploy_hash([i + 10; 32])
+                .build();
+
+            ExecuteRequestBuilder::from_deploy_item(deploy_item)
+                .with_block_time(1000 + i as u64)
+                .build()
+        };
+
+        builder.exec(faucet_call_by_user).expect_success().commit();
+    }
 
     // let remaining_requests = builder
     //     .query(
