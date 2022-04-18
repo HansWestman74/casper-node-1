@@ -434,12 +434,36 @@ pub fn set_variable_request(
     ExecuteRequestBuilder::from_deploy_item(deploy_item).build()
 }
 
+pub fn call_entry_point_with_contract_hash(
+    account_hash: AccountHash,
+    faucet_contract_hash: ContractHash,
+    user_fund_amount: U512,
+    deploy_hash: [u8; 32],
+    block_time: u64,
+) -> ExecuteRequest {
+    let deploy_item = DeployItemBuilder::new()
+        .with_address(account_hash)
+        .with_authorization_keys(&[account_hash])
+        .with_stored_session_hash(
+            faucet_contract_hash,
+            ENTRY_POINT_FAUCET,
+            runtime_args! {ARG_TARGET => account_hash, ARG_ID => <Option<u64>>::None},
+        )
+        .with_empty_payment_bytes(runtime_args! {ARG_AMOUNT => user_fund_amount})
+        .with_deploy_hash(deploy_hash)
+        .build();
+
+    ExecuteRequestBuilder::from_deploy_item(deploy_item)
+        .with_block_time(block_time)
+        .build()
+}
+
 pub fn call_entry_point(
     entry_point_name: &str,
     account_hash: AccountHash,
     runtime_args: RuntimeArgs,
     deploy_hash: [u8; 32],
-    block_time: u64,
+    block_time: Option<u64>,
 ) -> ExecuteRequest {
     let deploy_item = DeployItemBuilder::new()
         .with_address(account_hash)
@@ -453,9 +477,12 @@ pub fn call_entry_point(
         .with_deploy_hash(deploy_hash)
         .build();
 
-    ExecuteRequestBuilder::from_deploy_item(deploy_item)
-        .with_block_time(block_time)
-        .build()
+    match block_time {
+        Some(block_time) => ExecuteRequestBuilder::from_deploy_item(deploy_item)
+            .with_block_time(block_time)
+            .build(),
+        None => ExecuteRequestBuilder::from_deploy_item(deploy_item).build(),
+    }
 }
 
 pub fn get_available_amount(
