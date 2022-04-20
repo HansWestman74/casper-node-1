@@ -428,6 +428,8 @@ fn should_not_fund_once_exhausted_refactored() {
         .expect_success()
         .commit();
 
+    /////////////////////////======
+
     // // Fund installer account
     // let fund_installer_account_request = FundAccountRequestBuilder::new()
     //     .with_target_account(installer_account)
