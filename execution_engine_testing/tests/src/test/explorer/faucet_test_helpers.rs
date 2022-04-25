@@ -2,7 +2,6 @@ use rand::Rng;
 
 use casper_engine_test_support::{
     DeployItemBuilder, ExecuteRequestBuilder, InMemoryWasmTestBuilder, DEFAULT_ACCOUNT_ADDR,
-    DEFAULT_PAYMENT,
 };
 use casper_execution_engine::core::engine_state::ExecuteRequest;
 use casper_types::{
@@ -135,10 +134,6 @@ pub struct FaucetConfigRequestBuilder {
 }
 
 impl FaucetConfigRequestBuilder {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     pub fn with_installer_account(mut self, installer_account: AccountHash) -> Self {
         self.installer_account = installer_account;
         self
@@ -400,14 +395,14 @@ pub fn get_faucet_contract_hash(
         .expect("failed to find faucet contract")
 }
 
-pub fn get_faucet_key(builder: &InMemoryWasmTestBuilder, installer_account: AccountHash) -> Key {
-    builder
-        .get_expected_account(installer_account)
-        .named_keys()
-        .get(&format!("{}_{}", FAUCET_CONTRACT_NAMED_KEY, FAUCET_ID))
-        .cloned()
-        .expect("failed to find faucet key")
-}
+// pub fn get_faucet_key(builder: &InMemoryWasmTestBuilder, installer_account: AccountHash) -> Key {
+//     builder
+//         .get_expected_account(installer_account)
+//         .named_keys()
+//         .get(&format!("{}_{}", FAUCET_CONTRACT_NAMED_KEY, FAUCET_ID))
+//         .cloned()
+//         .expect("failed to find faucet key")
+// }
 
 pub fn get_faucet_contract(
     builder: &InMemoryWasmTestBuilder,
